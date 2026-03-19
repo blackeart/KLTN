@@ -53,3 +53,68 @@ function resetInterval() {
 
 // Bắt đầu chạy
 startInterval();
+
+const chatWindow = document.getElementById('chat-window');
+const chatBtn = document.getElementById('chat-btn'); // Nút xanh tròn
+const closeChat = document.getElementById('close-chat');
+const chatBody = document.getElementById('chat-body');
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
+
+// Đóng/Mở khung chat
+chatBtn.onclick = () => {
+  chatWindow.style.display =
+    chatWindow.style.display === 'flex' ? 'none' : 'flex';
+};
+closeChat.onclick = () => (chatWindow.style.display = 'none');
+
+// Hàm thêm tin nhắn vào màn hình
+function appendMessage(role, text) {
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `message ${role}`;
+  msgDiv.innerText = text;
+  chatBody.appendChild(msgDiv);
+  chatBody.scrollTop = chatBody.scrollHeight; // Cuộn xuống dưới cùng
+}
+
+// Hàm gửi tin nhắn lên Server
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  appendMessage('user', text); // Hiển thị tin nhắn người dùng
+  chatInput.value = '';
+
+  // Hiển thị trạng thái "đang trả lời..."
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'message bot';
+  loadingDiv.innerText = 'AI đang suy nghĩ...';
+  chatBody.appendChild(loadingDiv);
+
+  try {
+    const response = await fetch('/chat/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+    });
+
+    const result = await response.json();
+    chatBody.removeChild(loadingDiv); // Xóa dòng đang chờ
+
+    if (result.success) {
+      appendMessage('bot', result.data);
+    } else {
+      appendMessage('bot', 'Có lỗi xảy ra, bạn thử lại nhé!');
+    }
+  } catch (error) {
+    console.error(error);
+    chatBody.removeChild(loadingDiv);
+    appendMessage('bot', 'Không kết nối được với Server.');
+  }
+}
+
+// Bắt sự kiện nhấn nút gửi hoặc Enter
+sendBtn.onclick = sendMessage;
+chatInput.onkeypress = (e) => {
+  if (e.key === 'Enter') sendMessage();
+};

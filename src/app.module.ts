@@ -3,9 +3,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChatEntity } from './chat.entity';
+import { AiService } from './ai/ai.service';
+import { ConfigModule } from '@nestjs/config';
+import { ChatController } from './chat/chat.controller';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Để sử dụng ở mọi nơi mà không cần import lại
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -18,7 +24,7 @@ import { ChatEntity } from './chat.entity';
     }),
     TypeOrmModule.forFeature([ChatEntity]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, ChatController],
+  providers: [AppService, AiService],
 })
 export class AppModule {}
