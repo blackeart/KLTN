@@ -11,8 +11,10 @@ body {
   padding: 8px 0;
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 30px;
   font-size: 14px;
+  height: 50px;
 }
 .top-bar span b {
   color: #ffeb3b;
@@ -107,4 +109,217 @@ body {
 }
 .slider-btn:hover {
   background: rgba(0, 0, 0, 0.7);
+}
+
+/* ... Các CSS cũ giữ nguyên ... */
+
+.feature-container {
+  width: 100%;
+  padding: 50px 0;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+}
+
+.feature-content {
+  width: 70%; /* Chiếm 70% chiều rộng màn hình */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.feature-image {
+  width: 100%;
+  height: auto; /* Để ảnh tự co giãn theo tỉ lệ */
+  margin-bottom: 20px;
+}
+
+.feature-image img {
+  width: 100%;
+  display: block;
+  border-radius: 8px; /* Bo góc nhẹ cho ảnh trông hiện đại hơn */
+}
+
+/* Thiết kế nút bấm xanh */
+.btn-more {
+  display: inline-block;
+  background: linear-gradient(
+    to right,
+    #0072bc,
+    #005a9e
+  ); /* Màu xanh gradient */
+  color: white;
+  text-decoration: none;
+  padding: 12px 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.btn-more:hover {
+  background: linear-gradient(to right, #005a9e, #00457a);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-more span {
+  margin-left: 10px;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+/* Courses Section */
+.courses-section {
+  padding: 60px 0;
+  text-align: center;
+  background-color: #f9f9f9; /* Nền hơi xám nhẹ để tách biệt các phần */
+}
+
+.section-title {
+  color: #0056a0;
+  font-size: 28px;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+.courses-slider {
+  width: 80%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.courses-wrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.course-card {
+  flex: 1; /* Chia đều 3 card */
+  background: transparent;
+  transition: transform 0.3s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-10px); /* Hiệu ứng bay lên khi di chuột vào */
+}
+
+.card-image img {
+  width: 100%;
+  border-radius: 10px;
+  display: block;
+}
+
+.course-name {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #2c4a93;
+  font-size: 16px;
+  min-height: 40px; /* Đảm bảo tên dài không làm lệch hàng */
+}
+
+/* Slider Dots */
+.slider-dots {
+  margin-top: 20px;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: #0072bc;
+}
+
+/* Nút Xem thêm */
+.btn-view-all {
+  margin-top: 30px;
+  padding: 10px 30px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-view-all:hover {
+  background-color: #357abd;
+}
+
+/* Floating Widgets Container */
+.floating-widgets {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 1000;
+}
+
+/* Style chung cho các nút tròn */
+.widget-item {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: #0072bc;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
+  text-decoration: none;
+}
+
+.widget-item:hover {
+  transform: scale(1.1);
+  background-color: #005a9e;
+}
+
+/* Nút Nhận Tư Vấn - Chữ nhỏ xếp chồng */
+.consult-btn span {
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+/* Nút Chat - Màu đậm hơn một chút theo ảnh */
+.chat-toggle-btn {
+  background-color: #0068b3;
+}
+
+/* Hiệu ứng rung nhẹ để thu hút sự chú ý (Tùy chọn) */
+@keyframes shake {
+  0% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(5deg);
+  }
+  40% {
+    transform: rotate(-5deg);
+  }
+  60% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.chat-toggle-btn:hover .chat-icon {
+  animation: shake 0.5s infinite;
 }
