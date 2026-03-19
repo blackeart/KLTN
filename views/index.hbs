@@ -1,10 +1,57 @@
 <html>
   <head>
     <meta charset='utf-8' />
-    <title>Chatbot Tuyển Sinh</title>
+    <title>VTI Academy Clone</title>
+    <link rel='stylesheet' href='/css/style.css' />
   </head>
   <body>
-    <h1>{{message}}</h1>
-    <p>Chào mừng bạn đến với dự án khóa luận tốt nghiệp!</p>
+    <div class='top-bar'>
+      <span>📞 CS Hà Nội: <b>0866.805.563</b></span>
+      <span>📞 CS Đà Nẵng: <b>0968.834.386</b></span>
+      <span>📞 CS HCM: <b>0978.067.066</b></span>
+    </div>
+
+    <header class='main-header'>
+      <div class='logo'>
+        <img
+          src='	https://vtiacademy.edu.vn/upload/images/academy-02-01-01-01.png'
+          alt='Logo'
+        />
+      </div>
+
+      <ul class='nav-menu'>
+        <li><a href='#'>Về chúng tôi</a></li>
+        <li><a href='#'>Khóa học</a></li>
+        <li><a href='#'>Lịch khai giảng</a></li>
+        <li><a href='#'>Đào tạo doanh nghiệp</a></li>
+        <li><a href='#'>Đối tác</a></li>
+        <li><a href='#'>Học viên</a></li>
+        <li><a href='#'>Liên hệ</a></li>
+      </ul>
+
+      <div class='search-icon'>🔍</div>
+    </header>
+
+    <main>
+      <div class='slider-container'>
+        <div class='slide active'>
+          <img
+            src='https://vtiacademy.edu.vn/upload/images/data-04.png'
+            alt='Cơ hội vàng học 1 được 2'
+          />
+        </div>
+
+        <div class='slide'>
+          <img
+            src='https://vtiacademy.edu.vn/upload/images/z7612463236164-00b70c414107f3daeaf7653e959da8b8.jpg'
+            alt='Khóa học lập trình'
+          />
+        </div>
+
+        <button class='slider-btn prev-btn'>❮</button>
+        <button class='slider-btn next-btn'>❯</button>
+      </div>
+    </main>
+    <script src='/js/script.js'></script>
   </body>
 </html>

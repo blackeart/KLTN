@@ -13,6 +13,9 @@ async function bootstrap() {
   // Khai báo engine sử dụng là hbs
   app.setViewEngine('hbs');
 
+  // Serve static files (public/css, public/js, etc.)
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+
   await app.listen(3001);
 }
 bootstrap();
