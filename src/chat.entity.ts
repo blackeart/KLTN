@@ -10,6 +10,9 @@ export class ChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  sessionId: string;
+
   @Column({ type: 'text' })
   question: string; // Câu hỏi của thí sinh
 

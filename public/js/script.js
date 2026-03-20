@@ -118,3 +118,25 @@ sendBtn.onclick = sendMessage;
 chatInput.onkeypress = (e) => {
   if (e.key === 'Enter') sendMessage();
 };
+
+function typeWriter(text, element) {
+  let i = 0;
+  element.innerText = ''; // Xóa chữ cũ
+  function typing() {
+    if (i < text.length) {
+      element.innerText += text.charAt(i);
+      i++;
+      chatBody.scrollTop = chatBody.scrollHeight;
+      setTimeout(typing, 20); // Tốc độ chạy chữ 20ms
+    }
+  }
+  typing();
+}
+
+// Khi nhận được kết quả từ API
+if (result.success) {
+  const botMsgDiv = document.createElement('div');
+  botMsgDiv.className = 'message bot';
+  chatBody.appendChild(botMsgDiv);
+  typeWriter(result.data, botMsgDiv); // Gọi hiệu ứng chạy chữ
+}

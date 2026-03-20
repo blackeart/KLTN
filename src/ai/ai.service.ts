@@ -3,7 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { ChatEntity } from '../chat.entity'; // Đường dẫn tới file entity của bạn
+import { ChatEntity } from '../chat.entity'; // Đảm bảo đúng đường dẫn
+import { KnowledgeEntity } from '../knowledge.entity'; // Đảm bảo đúng đường dẫn
 
 @Injectable()
 export class AiService {
@@ -13,35 +14,85 @@ export class AiService {
   constructor(
     private configService: ConfigService,
     @InjectRepository(ChatEntity)
-    private chatRepository: Repository<ChatEntity>, // Tiêm Repository vào đây
+    private chatRepo: Repository<ChatEntity>,
+    @InjectRepository(KnowledgeEntity)
+    private knowledgeRepo: Repository<KnowledgeEntity>,
   ) {
     const apiKey = this.configService.get<string>('KEY_AI_GEMINI');
-    console.log('API Key check:', apiKey);
     this.genAI = new GoogleGenerativeAI(apiKey);
-    // Model Pro thường có độ phủ rộng hơn và ít lỗi 404 hơn ở các vùng khác nhau
     this.model = this.genAI.getGenerativeModel({
       model: 'gemini-3-flash-preview',
     });
   }
 
-  async handleChat(userQuestion: string) {
-    try {
-      const prompt = `Bạn là tư vấn viên VTI Academy. Trả lời câu hỏi: ${userQuestion}`;
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      const aiResponse = response.text();
+  // --- Chức năng cho Admin ---
 
-      // Lưu DB
-      const newChat = this.chatRepository.create({
+  async addKnowledge(title: string, content: string) {
+    const newK = this.knowledgeRepo.create({ title, content });
+    return await this.knowledgeRepo.save(newK);
+  }
+
+  async getAllKnowledge() {
+    return await this.knowledgeRepo.find({
+      order: { id: 'DESC' }, // Hiện cái mới nhất lên đầu
+    });
+  }
+
+  // --- Chức năng Chat có bộ nhớ và kiến thức ---
+
+  async handleChat(userQuestion: string, sessionId: string = 'guest-session') {
+    // 1. Lấy kiến thức thực tế từ DB
+    const knowledgeBase = await this.knowledgeRepo.find();
+    const context = knowledgeBase
+      .map((k) => `- ${k.title}: ${k.content}`)
+      .join('\n');
+
+    // 2. Lấy lịch sử 5 câu gần nhất để AI "nhớ" ngữ cảnh
+    const history = await this.chatRepo.find({
+      where: { sessionId },
+      order: { createdAt: 'DESC' },
+      take: 5,
+    });
+
+    // Đảo ngược lại để đúng thứ tự thời gian
+    const historyText = history
+      .reverse()
+      .map((h) => `Người dùng: ${h.question}\nAI: ${h.answer}`)
+      .join('\n');
+
+    // 3. Xây dựng Prompt nâng cao (RAG + Memory)
+    const systemPrompt = `
+      Bạn là tư vấn viên tuyển sinh chuyên nghiệp của VTI Academy.
+      Sử dụng KIẾN THỨC NỘI BỘ dưới đây để trả lời câu hỏi. 
+      Nếu câu hỏi liên quan đến nội dung trong LỊCH SỬ CHAT, hãy trả lời tiếp nối ngữ cảnh đó.
+
+      KIẾN THỨC NỘI BỘ:
+      ${context}
+
+      LỊCH SỬ CHAT GẦN ĐÂY:
+      ${historyText}
+
+      CÂU HỎI HIỆN TẠI: ${userQuestion}
+      
+      TRẢ LỜI: (Hãy trả lời thân thiện, ngắn gọn và chính xác)
+    `;
+
+    try {
+      const result = await this.model.generateContent(systemPrompt);
+      const aiResponse = result.response.text();
+
+      // 4. Lưu vào Database
+      const chatLog = this.chatRepo.create({
+        sessionId,
         question: userQuestion,
         answer: aiResponse,
       });
-      await this.chatRepository.save(newChat);
+      await this.chatRepo.save(chatLog);
 
       return aiResponse;
     } catch (error) {
-      console.error('Lỗi chi tiết từ Google AI:', error);
-      return 'Xin lỗi, chatbot đang bảo trì. Bạn vui lòng liên hệ hotline 0866.805.563 nhé!';
+      console.error('Lỗi AI:', error);
+      return 'Xin lỗi, hệ thống đang bận một chút. Bạn vui lòng thử lại sau nhé!';
     }
   }
 }

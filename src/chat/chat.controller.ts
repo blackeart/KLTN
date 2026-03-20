@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Render } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger'; // Thêm các decorator này
 import { AiService } from '../ai/ai.service';
 
@@ -23,5 +23,30 @@ export class ChatController {
       success: true,
       data: reply,
     };
+  }
+
+  @Get('admin')
+  @Render('admin')
+  getAdminPage() {
+    return { title: 'Quản trị AI' };
+  }
+
+  @Post('knowledge')
+  async addKnowledge(@Body() data: { title: string; content: string }) {
+    // Thêm log để kiểm tra ở terminal
+    console.log('Đang lưu kiến thức:', data);
+    return await this.aiService.addKnowledge(data.title, data.content);
+  }
+
+  // SỬA Ở ĐÂY: Đổi 'add' thành 'all' để khớp với fetch bên ngoài
+  @Get('knowledge/all')
+  async getKnowledge() {
+    const data = await this.aiService.getAllKnowledge();
+    return data; // NestJS tự hiểu đây là JSON
+  }
+
+  @Get('test')
+  async getKnowledge2() {
+    return 'Kết nối OK!';
   }
 }

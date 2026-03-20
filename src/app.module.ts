@@ -6,6 +6,7 @@ import { ChatEntity } from './chat.entity';
 import { AiService } from './ai/ai.service';
 import { ConfigModule } from '@nestjs/config';
 import { ChatController } from './chat/chat.controller';
+import { KnowledgeEntity } from './knowledge.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { ChatController } from './chat/chat.controller';
       autoLoadEntities: true, // Tự động nhận diện các Entity (Table) bạn tạo sau này
       synchronize: true, // Tự động tạo table từ code (Rất hữu ích khi làm khóa luận)
     }),
-    TypeOrmModule.forFeature([ChatEntity]),
+    TypeOrmModule.forFeature([ChatEntity, KnowledgeEntity]),
   ],
   controllers: [AppController, ChatController],
   providers: [AppService, AiService],

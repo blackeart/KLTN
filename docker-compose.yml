@@ -1,6 +1,7 @@
 services:
   postgres:
-    image: postgres:15
+    # Thay đổi image từ postgres:15 sang pgvector/pgvector:pg15
+    image: pgvector/pgvector:pg15
     container_name: nestjs_db
     restart: always
     environment:
@@ -8,7 +9,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: nest_db
     ports:
-      - '5433:5432' # <--- Đổi số bên trái thành 5433
+      - '5433:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
