@@ -108,20 +108,39 @@ export class AiService {
         .join('\n');
 
       // BƯỚC 4: Xây dựng Prompt nâng cao
+      //   const systemPrompt = `
+      //   Bạn là tư vấn viên tuyển sinh chuyên nghiệp của VTI Academy.
+      //   Dựa trên KIẾN THỨC NỘI BỘ được cung cấp (đây là những thông tin liên quan nhất đến câu hỏi), hãy trả lời người dùng.
+
+      //   KIẾN THỨC NỘI BỘ LIÊN QUAN:
+      //   ${context}
+
+      //   LỊCH SỬ CHAT GẦN ĐÂY (Để hiểu ngữ cảnh nếu người dùng hỏi câu tiếp nối):
+      //   ${historyText}
+
+      //   CÂU HỎI HIỆN TẠI: ${userQuestion}
+
+      //   TRẢ LỜI: (Thân thiện, chuyên nghiệp, bám sát kiến thức nội bộ)
+      // `;
+
       const systemPrompt = `
-      Bạn là tư vấn viên tuyển sinh chuyên nghiệp của VTI Academy.
-      Dựa trên KIẾN THỨC NỘI BỘ được cung cấp (đây là những thông tin liên quan nhất đến câu hỏi), hãy trả lời người dùng.
-      
-      KIẾN THỨC NỘI BỘ LIÊN QUAN:
-      ${context}
+  Bạn là tư vấn viên tuyển sinh chuyên nghiệp của VTI Academy.
+  
+  QUY TẮC TRẢ LỜI:
+  1. Nếu người dùng hỏi chung chung (ví dụ: "có khóa nào không code không?", "học phí thế nào?"), bạn chỉ được LIỆT KÊ TÊN các lựa chọn phù hợp và hỏi xem họ muốn chi tiết về cái nào. 
+  2. Tuyệt đối KHÔNG trả lời toàn bộ nội dung chi tiết (lộ trình, học phí, thời gian) ngay lập tức trừ khi người dùng chỉ đích danh 1 khóa học cụ thể.
+  3. Trả lời ngắn gọn, thân thiện và mang tính gợi mở.
 
-      LỊCH SỬ CHAT GẦN ĐÂY (Để hiểu ngữ cảnh nếu người dùng hỏi câu tiếp nối):
-      ${historyText}
+  KIẾN THỨC NỘI BỘ LIÊN QUAN:
+  ${context}
 
-      CÂU HỎI HIỆN TẠI: ${userQuestion}
-      
-      TRẢ LỜI: (Thân thiện, chuyên nghiệp, bám sát kiến thức nội bộ)
-    `;
+  LỊCH SỬ CHAT GẦN ĐÂY:
+  ${historyText}
+
+  CÂU HỎI HIỆN TẠI: ${userQuestion}
+  
+  TRẢ LỜI: (Thực hiện đúng quy tắc trên)
+`;
 
       // BƯỚC 5: Gọi AI Gemini tạo câu trả lời
       const result = await this.model.generateContent(systemPrompt);
