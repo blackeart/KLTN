@@ -21,7 +21,7 @@
 
       <ul class='nav-menu'>
         <li><a href='#'>Về chúng tôi</a></li>
-        <li><a href='#'>Khóa học</a></li>
+        <li><a href='/courses/view'>Khóa học</a></li>
         <li><a href='#'>Lịch khai giảng</a></li>
         <li><a href='#'>Đào tạo doanh nghiệp</a></li>
         <li><a href='#'>Đối tác</a></li>
@@ -176,6 +176,121 @@
         <button id='send-btn'>➤</button>
       </div>
     </div>
+
+    <div class='reg-section'>
+      <div class='reg-container'>
+        <div class='reg-left'>
+          <div class='promo-badge'>Cơ hội nhận ưu đãi học phí lên tới 40%</div>
+          <p class='promo-text'>Liên hệ với chúng tôi để bắt đầu gia nhập ngành
+            CNTT nhanh chóng và thành công!</p>
+
+          <div class='countdown-wrapper'>
+            <div class='time-box'>
+              <span class='label'>Ngày</span>
+              <span class='number' id='days'>00</span>
+            </div>
+            <div class='time-box'>
+              <span class='label'>Giờ</span>
+              <span class='number' id='hours'>08</span>
+            </div>
+            <div class='time-box'>
+              <span class='label'>Phút</span>
+              <span class='number' id='minutes'>07</span>
+            </div>
+            <div class='time-box'>
+              <span class='label'>Giây</span>
+              <span class='number' id='seconds'>20</span>
+            </div>
+          </div>
+        </div>
+
+        <div class='reg-right'>
+          <form class='reg-form'>
+            <h3>Đăng ký tư vấn<br />cùng đội ngũ chuyên gia VTI ACADEMY!!</h3>
+            <input type='text' placeholder='Họ và tên*' required />
+            <input type='email' placeholder='Địa chỉ email' />
+            <input type='tel' placeholder='Số điện thoại*' required />
+            <select>
+              <option value='' disabled selected>Địa điểm</option>
+              <option value='hn'>Hà Nội</option>
+              <option value='dn'>Đà Nẵng</option>
+              <option value='hcm'>TP. Hồ Chí Minh</option>
+            </select>
+            <textarea placeholder='Khóa học quan tâm'></textarea>
+            <button type='submit' class='btn-submit'>Gửi đi</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer class='main-footer'>
+      <div class='footer-container'>
+        <div class='footer-col'>
+          <h3>Cơ sở Hà Nội</h3>
+          <ul class='branch-list'>
+            <li>📍 T7, 235 Hoàng Cầu Mới, Đống Đa, Hà Nội
+              <a href='#'>[Bản đồ]</a></li>
+            <li>📍 T9, Toà nhà Handico Tower, Phạm Hùng, Từ Liêm, Hà Nội
+              <a href='#'>[Bản đồ]</a></li>
+            <li>📍 VTI Building, Khu đô thị Mễ Trì Hạ, Từ Liêm, Hà Nội
+              <a href='#'>[Bản đồ]</a></li>
+            <li>📍 T3, Tháp A, Toà nhà Sông Đà, Nam Từ Liêm, Hà Nội
+              <a href='#'>[Bản đồ]</a></li>
+            <li class='hotline'>📞 Hotline: 0865.359.388 - 0866.805.563</li>
+          </ul>
+        </div>
+
+        <div class='footer-col'>
+          <h3>Cơ sở Đà Nẵng</h3>
+          <ul class='branch-list'>
+            <li>📍 T4, toà nhà Phúc Hưng Việt, số 43-45 Nguyễn Văn Linh, Quận
+              Hải Châu, TP Đà Nẵng
+              <a href='#'>[Bản đồ]</a></li>
+            <li class='hotline'>📞 Hotline: 0968.834.386</li>
+          </ul>
+          <h3 class='mt-20'>Cơ sở Hồ Chí Minh</h3>
+          <ul class='branch-list'>
+            <li>📍 T4, 35 Mạc Đĩnh Chi, Q.1, TP.HCM
+              <a href='#'>[Bản đồ]</a></li>
+            <li class='hotline'>📞 Hotline: 0978.067.066</li>
+          </ul>
+        </div>
+
+        <div class='footer-col'>
+          <h3>Cơ sở Nhật Bản</h3>
+          <ul class='branch-list'>
+            <li>📍 4th Floor, T&T Building, 8-21 Tomihisacho, Shinjuku-ku, Tokyo</li>
+            <li>📍 4th Floor, Belx Shinjuku Building, 23-14 Aizumicho,
+              Shinjuku-ku, Tokyo</li>
+          </ul>
+          <h3 class='mt-20'>Cơ sở Hàn Quốc</h3>
+          <ul class='branch-list'>
+            <li>📍 13 Floor, Goryeo Daeyeongak Tower, 97 Toegye-ro, Jung-gu,
+              Seoul</li>
+          </ul>
+          <h3 class='mt-20'>Cơ sở Singapore</h3>
+          <ul class='branch-list'>
+            <li>📍 20A Tanjong Pagar Road</li>
+          </ul>
+        </div>
+
+        {{! <div class="footer-col">
+      <h3>Kết nối với chúng tôi</h3>
+      <div class="fb-page-mockup">
+        <img src="https://via.placeholder.com/250x130?text=VTI+Academy+Facebook+Fanpage" alt="FB Fanpage">
+      </div>
+      <div class="social-icons">
+        <a href="#" class="icon tiktok"></a>
+        <a href="#" class="icon facebook"></a>
+        <a href="#" class="icon youtube"></a>
+      </div>
+    </div> }}
+      </div>
+
+      <div class='footer-bottom'>
+        Copyright © 2021 VTI ACADEMY
+      </div>
+    </footer>
     <script src='/js/script.js'></script>
   </body>
 </html>

@@ -133,6 +133,55 @@ function typeWriter(text, element) {
   typing();
 }
 
+function startCountdown() {
+  // Thiết lập thời gian kết thúc: 8 giờ kể từ hiện tại
+  const durationInMilliseconds = 8 * 60 * 60 * 1000 + 7 * 60 * 1000 + 20 * 1000; // 08:07:20
+  const endTime = new Date().getTime() + durationInMilliseconds;
+
+  const timer = setInterval(() => {
+    const now = new Date().getTime();
+    const distance = endTime - now;
+
+    // Tính toán Ngày, Giờ, Phút, Giây
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Hiển thị ra giao diện (padSart để luôn có 2 chữ số)
+    document.getElementById('days').innerText = days
+      .toString()
+      .padStart(2, '0');
+    document.getElementById('hours').innerText = hours
+      .toString()
+      .padStart(2, '0');
+    document.getElementById('minutes').innerText = minutes
+      .toString()
+      .padStart(2, '0');
+    document.getElementById('seconds').innerText = seconds
+      .toString()
+      .padStart(2, '0');
+
+    // Xử lý khi đếm ngược kết thúc
+    if (distance < 0) {
+      clearInterval(timer);
+      document.getElementById('days').innerText = '00';
+      document.getElementById('hours').innerText = '00';
+      document.getElementById('minutes').innerText = '00';
+      document.getElementById('seconds').innerText = '00';
+
+      // Bạn có thể thêm hành động tùy ý ở đây
+      console.log('Ưu đãi đã hết hạn!');
+      // Ví dụ: Ẩn phần countdown hoặc đổi chữ thành "Đã hết ưu đãi"
+    }
+  }, 1000);
+}
+
+// Gọi hàm khi trang web tải xong
+document.addEventListener('DOMContentLoaded', startCountdown);
+
 // Khi nhận được kết quả từ API
 if (result.success) {
   const botMsgDiv = document.createElement('div');

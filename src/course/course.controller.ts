@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Render,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -18,6 +19,13 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('courses')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
+
+  @Get('view')
+  @Render('course') // Render file course.hbs
+  async getCourseView() {
+    const courses = await this.courseService.findAllCourses();
+    return { courses }; // Truyền danh sách khóa học sang file .hbs
+  }
 
   @Post()
   @ApiOperation({ summary: 'Tạo khóa học mới (Tổng quan)' })

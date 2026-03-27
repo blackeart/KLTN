@@ -400,3 +400,316 @@ body {
   margin-left: 10px;
   cursor: pointer;
 }
+
+.course-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Chia 3 cột */
+  gap: 30px;
+  padding: 0 20px;
+}
+.course-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+.course-card:hover {
+  transform: translateY(-5px);
+}
+.course-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: #f0f0f0;
+}
+.course-info {
+  padding: 20px;
+}
+.course-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #003366; /* Màu xanh đậm giống VTI */
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.course-desc {
+  color: #666;
+  font-size: 0.95rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Giới hạn 3 dòng mô tả */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.btn-more {
+  display: inline-block;
+  background: #0056b3;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* Hero Section - Banner trên cùng */
+.hero-section {
+  width: 100%;
+  height: 350px;
+  background-image: url('https://lh3.googleusercontent.com/d/1Z_u8hRjXy0X7y6Z1-Z_u8hRjXy0X7y6Z'); /* Link ảnh banner của bạn */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Lớp phủ mờ nhẹ nếu cần để nổi bật chữ */
+/* Container chính cho banner và breadcrumb */
+.hero-banner-container {
+  width: 100%;
+  position: relative; /* Để breadcrumb dính vào mép dưới */
+  line-height: 0; /* Xóa khoảng trắng thừa dưới ảnh của thẻ img mặc định */
+}
+
+/* Style cho tấm ảnh banner */
+.hero-banner-img {
+  width: 100%;
+  height: auto; /* Để ảnh tự co giãn theo tỉ lệ gốc, không bị méo */
+  max-height: 400px; /* Giới hạn chiều cao tối đa để không quá to */
+  object-fit: cover; /* Đảm bảo ảnh phủ kín chiều rộng */
+  display: block;
+}
+
+/* Breadcrumb - Thanh xám nhỏ ở dưới banner (Giữ nguyên) */
+.hero-breadcrumb {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4); /* Màu xám mờ giống ảnh mẫu */
+  padding: 10px 0;
+  color: white;
+  font-size: 13px;
+  line-height: 1.4; /* Reset lại line-height cho chữ */
+}
+
+.breadcrumb-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hero-breadcrumb a {
+  color: white;
+  text-decoration: none;
+}
+
+.hero-breadcrumb span {
+  margin: 0 8px;
+}
+
+/* Registration Section */
+.reg-section {
+  width: 100%;
+  height: 550px;
+  background-color: #0056a0; /* Màu xanh chủ đạo */
+  background-image: radial-gradient(
+    circle at 20% 50%,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 25%
+  );
+  padding: 80px 0;
+  color: white;
+}
+
+.reg-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+}
+
+/* Left Side */
+.reg-left {
+  flex: 1;
+}
+
+.promo-badge {
+  background-color: #ffff00; /* Màu vàng rực */
+  color: #0056a0;
+  display: inline-block;
+  font-size: 28px;
+  font-weight: bold;
+  padding: 10px 20px;
+  margin-bottom: 25px;
+}
+
+.promo-text {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.countdown-wrapper {
+  display: flex;
+  gap: 30px;
+}
+.time-box {
+  text-align: center;
+}
+.time-box .label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.time-box .number {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+/* Right Side - Form */
+.reg-right {
+  width: 450px;
+  background: white;
+  border-radius: 10px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.reg-form h3 {
+  color: #0056a0;
+  font-size: 20px;
+  margin-bottom: 25px;
+  line-height: 1.4;
+}
+
+.reg-form input,
+.reg-form select,
+.reg-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+}
+
+.reg-form textarea {
+  height: 80px;
+  resize: none;
+}
+
+.btn-submit {
+  width: 100%;
+  background-color: #2c4a93;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-submit:hover {
+  background-color: #1e356d;
+}
+
+/* Footer Styles */
+.main-footer {
+  background-color: #f4f7f9; /* Màu nền xám nhạt như ảnh */
+  padding: 60px 0 0 0;
+  color: #333;
+  font-size: 13px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Chia 4 cột */
+  gap: 30px;
+  padding: 0 20px 40px 20px;
+}
+
+.footer-col h3 {
+  color: #2c4a93; /* Màu xanh đậm tiêu đề */
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-transform: none;
+}
+
+.branch-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.branch-list li {
+  margin-bottom: 12px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.branch-list a {
+  color: #0072bc;
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.hotline {
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.mt-20 {
+  margin-top: 30px;
+}
+
+/* Facebook Mockup */
+.fb-page-mockup img {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Social Icons */
+.social-icons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.social-icons .icon {
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  background-color: #555; /* Tạm thời để màu xám */
+  border-radius: 4px;
+}
+
+/* Footer Bottom Blue Bar */
+.footer-bottom {
+  background-color: #2c4a93;
+  color: white;
+  text-align: center;
+  padding: 15px 0;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.number {
+  font-family: 'Courier New', Courier, monospace; /* Font dạng digital */
+  color: #ffeb3b; /* Màu vàng giống số điện thoại trên Top-bar */
+  text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+  transition: all 0.3s ease;
+}
