@@ -9,6 +9,9 @@ import { AuthModule } from './auth/auth.module'; // Import cái này
 import { ChatEntity } from './entities/chat.entity';
 import { KnowledgeEntity } from './entities/knowledge.entity';
 import { UserEntity } from './entities/user.entity';
+import { CourseEntity } from './entities/course.entity';
+import { CourseClassEntity } from './entities/course-class.entity';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -23,9 +26,16 @@ import { UserEntity } from './entities/user.entity';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([ChatEntity, KnowledgeEntity, UserEntity]),
+    TypeOrmModule.forFeature([
+      ChatEntity,
+      KnowledgeEntity,
+      UserEntity,
+      CourseEntity,
+      CourseClassEntity,
+    ]),
     // 3. THÊM AUTH MODULE VÀO ĐÂY
     AuthModule,
+    CourseModule,
   ],
   controllers: [AppController, ChatController],
   // 4. XÓA AuthController và AuthService khỏi đây vì nó đã nằm trong AuthModule rồi
