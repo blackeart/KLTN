@@ -1,31 +1,34 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ChatEntity } from './chat.entity';
-import { AiService } from './ai/ai.service';
-import { ConfigModule } from '@nestjs/config';
 import { ChatController } from './chat/chat.controller';
-import { KnowledgeEntity } from './knowledge.entity';
+import { AiService } from './ai/ai.service';
+import { AuthModule } from './auth/auth.module'; // Import cái này
+import { ChatEntity } from './entities/chat.entity';
+import { KnowledgeEntity } from './entities/knowledge.entity';
+import { UserEntity } from './entities/user.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, // Để sử dụng ở mọi nơi mà không cần import lại
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
-      port: 5433, // Cổng bạn đã map ở docker-compose
-      username: 'user', // Khớp với POSTGRES_USER trong docker-compose
-      password: 'password', // Khớp với POSTGRES_PASSWORD
-      database: 'nest_db', // Khớp với POSTGRES_DB
-      autoLoadEntities: true, // Tự động nhận diện các Entity (Table) bạn tạo sau này
-      synchronize: true, // Tự động tạo table từ code (Rất hữu ích khi làm khóa luận)
+      port: 5433,
+      username: 'user',
+      password: 'password',
+      database: 'nest_db',
+      autoLoadEntities: true,
+      synchronize: true,
     }),
-    TypeOrmModule.forFeature([ChatEntity, KnowledgeEntity]),
+    TypeOrmModule.forFeature([ChatEntity, KnowledgeEntity, UserEntity]),
+    // 3. THÊM AUTH MODULE VÀO ĐÂY
+    AuthModule,
   ],
   controllers: [AppController, ChatController],
+  // 4. XÓA AuthController và AuthService khỏi đây vì nó đã nằm trong AuthModule rồi
   providers: [AppService, AiService],
 })
 export class AppModule {}

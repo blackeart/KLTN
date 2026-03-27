@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get, Render } from '@nestjs/common';
+import { Controller, Post, Body, Get, Render, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger'; // Thêm các decorator này
 import { AiService } from '../ai/ai.service';
+import { AuthViewGuard } from 'src/auth/roles.guard';
 
 @ApiTags('Chat') // Tên nhóm API trong Swagger
 @Controller('chat')
@@ -25,6 +26,7 @@ export class ChatController {
     };
   }
 
+  @UseGuards(AuthViewGuard)
   @Get('admin')
   @Render('admin')
   getAdminPage() {

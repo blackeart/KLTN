@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { ChatEntity } from '../chat.entity'; // Đảm bảo đúng đường dẫn
-import { KnowledgeEntity } from '../knowledge.entity'; // Đảm bảo đúng đường dẫn
+import { ChatEntity } from '../entities/chat.entity'; // Đảm bảo đúng đường dẫn
+import { KnowledgeEntity } from '../entities/knowledge.entity'; // Đảm bảo đúng đường dẫn
 
 @Injectable()
 export class AiService {
