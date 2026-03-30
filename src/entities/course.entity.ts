@@ -1,6 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { CourseClassEntity } from './course-class.entity';
 
+export interface ICurriculumDay {
+  dayTitle: string;
+  lessons: string[];
+}
+
+export interface ICurriculumModule {
+  moduleName: string;
+  days: ICurriculumDay[];
+}
+
 @Entity('courses')
 export class CourseEntity {
   @PrimaryGeneratedColumn()
@@ -25,7 +35,7 @@ export class CourseEntity {
   images: string[];
 
   @Column({ type: 'jsonb', default: [] })
-  curriculum: string[]; // Trường này 1 từ nên không cần đổi
+  curriculum: ICurriculumModule[];
 
   @OneToMany(() => CourseClassEntity, (courseClass) => courseClass.course)
   classes: CourseClassEntity[];

@@ -93,4 +93,13 @@ export class CourseController {
   ) {
     return this.courseService.updateClass(id, dto);
   }
+
+  @Get('detail/:id')
+  @Render('course-detail') // Thêm dòng này để NestJS biết phải vẽ file .hbs nào
+  async getCourseDetail(@Param('id') id: number) {
+    const course = await this.courseService.findOne(id);
+
+    // Dữ liệu trả về sẽ được map trực tiếp vào các biến {{course.xxx}} trong file hbs
+    return { course };
+  }
 }

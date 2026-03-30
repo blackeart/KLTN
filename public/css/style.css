@@ -713,3 +713,482 @@ body {
   text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
   transition: all 0.3s ease;
 }
+
+/* Course Intro Section */
+.course-intro-section {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.course-intro-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 0 20px;
+}
+
+/* Box nội dung bên trái */
+.intro-content-box {
+  flex: 1;
+  background: #f1f1f1; /* Màu nền xám nhạt như ảnh */
+  padding: 50px;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 2;
+}
+
+.intro-title {
+  color: #2c4a93;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.title-underline {
+  width: 120px;
+  height: 4px;
+  background-color: #2c4a93;
+  margin-bottom: 30px;
+}
+
+.intro-description {
+  color: #444;
+  line-height: 1.8;
+  font-size: 16px;
+  margin-bottom: 40px;
+  text-align: justify;
+}
+
+/* Nút bấm */
+.intro-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.intro-actions .btn-primary,
+.intro-actions .btn-secondary {
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.btn-primary {
+  background-color: #0056a0;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #1e88e5;
+  color: white;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* Box hình ảnh bên phải */
+.intro-image-box {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.intro-img {
+  width: 100%;
+  max-width: 550px;
+  border-radius: 10px;
+  box-shadow: 5px 15px 35px rgba(0, 0, 0, 0.15);
+  object-fit: cover;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 992px) {
+  .course-intro-container {
+    flex-direction: column;
+  }
+  .intro-content-box {
+    order: 2;
+  }
+  .intro-image-box {
+    order: 1;
+    width: 100%;
+  }
+}
+
+/* Target & Opportunity Section */
+.course-target-section {
+  padding: 80px 0;
+  background-color: #fff;
+}
+
+.target-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 20px;
+}
+
+.target-column {
+  flex: 1;
+}
+
+.target-title {
+  color: #2c4a93;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Tái sử dụng underline từ phần trước */
+.target-column .title-underline {
+  width: 100px;
+  height: 3px;
+  background-color: #2c4a93;
+  margin-bottom: 30px;
+}
+
+.target-list {
+  list-style: none;
+  padding: 0;
+}
+
+.target-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.icon-arrow {
+  color: #1e88e5; /* Màu xanh mũi tên */
+  font-size: 14px;
+  margin-top: 3px;
+}
+
+.target-list p {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Đường kẻ đứng ở giữa */
+.vertical-divider {
+  width: 1px;
+  background-color: #2c4a93;
+  margin: 0 40px;
+  opacity: 0.5;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .target-container {
+    flex-direction: column;
+  }
+  .vertical-divider {
+    display: none;
+  }
+  .target-column {
+    margin-bottom: 40px;
+  }
+}
+
+/* Benefits Section */
+.course-benefits-section {
+  padding: 80px 0;
+  background-color: #fff;
+}
+
+.benefits-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  padding: 0 20px;
+}
+
+/* Image Wrapper & Decoration */
+.benefits-image-wrapper {
+  flex: 1;
+  position: relative;
+  padding: 20px;
+}
+
+.benefits-img-box img {
+  width: 100%;
+  border-radius: 4px;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.image-border-deco {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border: 2px solid #2c4a93;
+  z-index: 1;
+}
+
+.image-border-deco.top-left {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 40px 0 0 0;
+}
+
+.image-border-deco.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 40px 0;
+}
+
+/* Content */
+.benefits-content {
+  flex: 1.5;
+}
+
+.benefits-title {
+  color: #2c4a93;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.benefits-content .title-underline {
+  width: 120px;
+  height: 3px;
+  background-color: #2c4a93;
+  margin-bottom: 30px;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+}
+
+.benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.bullet-dot {
+  color: #2c4a93;
+  font-size: 18px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.benefits-list p {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .benefits-container {
+    flex-direction: column;
+  }
+  .benefits-image-wrapper {
+    max-width: 500px;
+    margin-bottom: 40px;
+  }
+}
+
+/* Curriculum Timeline Section */
+.curriculum-section {
+  padding: 80px 0;
+  background-color: #fff;
+}
+
+.curriculum-main-title {
+  text-align: center;
+  color: #2c4a93;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.title-underline-center {
+  width: 150px;
+  height: 3px;
+  background-color: #2c4a93;
+  margin: 10px auto 50px;
+}
+
+.timeline-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  padding-top: 40px;
+}
+
+/* Trục dọc */
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #2c4a93;
+  transform: translateX(-50%);
+}
+
+.module-block {
+  position: relative;
+  margin-bottom: 60px;
+}
+
+/* Badge Module màu xanh bo góc */
+.module-badge {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0d47a1;
+  color: #fff;
+  padding: 5px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 3;
+}
+
+.module-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.module-left,
+.module-right {
+  width: 45%;
+}
+
+/* Hình tròn chứa ảnh bên trái */
+.module-left {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 50px;
+}
+
+.module-image-circle {
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  border: 1px solid #2c4a93;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.module-image-circle img {
+  width: 80%;
+  object-fit: contain;
+}
+
+/* Điểm tròn xanh trên trục */
+.timeline-dot {
+  width: 20px;
+  height: 20px;
+  background-color: #0d47a1;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 150px;
+  transform: translateX(-50%);
+  z-index: 2;
+  border: 4px solid #fff;
+}
+
+/* Nội dung bên phải */
+.module-right {
+  padding-left: 50px;
+}
+
+.module-name {
+  color: #1e88e5;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.day-item {
+  margin-bottom: 25px;
+}
+
+.day-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.lesson-list {
+  list-style: none;
+  padding-left: 20px;
+}
+
+.lesson-list li {
+  position: relative;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* Bullet point dấu chấm đen */
+.lesson-list li::before {
+  content: '•';
+  position: absolute;
+  left: -15px;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .timeline-line {
+    left: 30px;
+    transform: none;
+  }
+  .module-badge {
+    left: 30px;
+    transform: none;
+  }
+  .timeline-dot {
+    left: 30px;
+    transform: translateX(-50%);
+    top: 50px;
+  }
+  .module-layout {
+    flex-direction: column;
+  }
+  .module-left {
+    display: none;
+  }
+  .module-right {
+    width: 100%;
+    padding-left: 60px;
+  }
+}

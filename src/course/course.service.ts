@@ -110,4 +110,12 @@ export class CourseService {
     Object.assign(courseClass, updateData);
     return await this.classRepo.save(courseClass);
   }
+
+  async findOne(id: number) {
+    const course = await this.courseRepo.findOne({ where: { id } });
+    if (!course) {
+      throw new NotFoundException(`Không tìm thấy khóa học với id ${id}`);
+    }
+    return course;
+  }
 }
