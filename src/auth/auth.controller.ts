@@ -22,6 +22,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Đăng ký tài khoản Admin mới' })
   async register(@Body() authDto: AuthDto) {
     // Bây giờ bạn có thể dùng authDto.username thay vì body.username
+    console.log('Đăng ký với username:', authDto.username);
     return this.authService.register(authDto.username, authDto.password);
   }
 
@@ -34,7 +35,7 @@ export class AuthController {
       authDto.username,
       authDto.password,
     );
-
+    console.log('Đăng nhập với username:', authDto.username);
     // Server tự set cookie tại đây
     response.cookie('access_token', data.access_token, {
       httpOnly: true, // Bảo mật, JS không đọc được để tránh XSS
