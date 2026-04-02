@@ -1,10 +1,14 @@
 import { Controller, Get, Render, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthViewGuard } from './auth/roles.guard';
+import { CourseService } from './course/course.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly coursesService: CourseService,
+  ) {}
 
   // @Get()
   // getHello(): string {
@@ -24,10 +28,18 @@ export class AppController {
     return {}; // Trả về trang login.hbs
   }
 
-  @UseGuards(AuthViewGuard) // CHẶN Ở ĐÂY
+  @UseGuards(AuthViewGuard)
   @Get('admin')
   @Render('admin') // Trả về trang admin.hbs
   getAdmin() {
     return { user: 'Admin VTI' };
+  }
+
+  @UseGuards(AuthViewGuard)
+  @Get('admin-dashboard')
+  @Render('admin-dashboard') // Trả về trang admin-dashboard.hbs
+  async getAdminPage() {
+    const courses = await this.coursesService.findAllCourses();
+    return { courses };
   }
 }

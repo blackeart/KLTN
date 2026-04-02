@@ -1,0 +1,135 @@
+<html lang='vi'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Admin - Quản lý khóa học | VTI Academy Clone</title>
+
+    <link rel='stylesheet' href='/css/style.css' />
+  </head>
+  <body class='admin-page'>
+
+    <div class='admin-container'>
+      <div class='admin-header'>
+        <h1>Quản lý khóa học</h1>
+        <button class='btn-add' onclick="openModal('add')">
+          + Thêm khóa học mới
+        </button>
+      </div>
+
+      <table class='admin-table'>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên khóa học</th>
+            <th>Mô tả</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each courses}}
+            <tr>
+              <td>{{this.id}}</td>
+              <td><b>{{this.name}}</b></td>
+              <td><div class='text-truncate'>{{this.description}}</div></td>
+              <td>
+                <div class='action-btns'>
+                  <button
+                    class='btn-edit'
+                    onclick='editCourse({{this.id}})'
+                  >Sửa</button>
+                  <button
+                    class='btn-delete'
+                    onclick='deleteCourse({{this.id}})'
+                  >Xóa</button>
+                </div>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <div id='courseModal' class='modal'>
+      <div class='modal-content'>
+        <span class='close-btn' onclick='closeModal()'>&times;</span>
+        <h2 id='modalTitle'>Thông tin khóa học</h2>
+
+        <form id='courseForm'>
+          <div class='form-section'>
+            <label>Tên khóa học</label>
+            <input
+              type='text'
+              name='name'
+              id='courseName'
+              placeholder='VD: Khóa học ReactJS chuyên sâu'
+              required
+            />
+
+            <label>Mô tả ngắn</label>
+            <textarea
+              name='description'
+              id='courseDescription'
+              placeholder='Mô tả khóa học...'
+            ></textarea>
+
+            <label>Link ảnh Banner</label>
+            <input
+              type='text'
+              name='imageUrl'
+              id='courseImageUrl'
+              placeholder='https://...'
+            />
+          </div>
+
+          <div class='form-row'>
+            <div class='form-group'>
+              <label>Đối tượng tham gia (mỗi dòng 1 ý)</label>
+              <textarea
+                name='targetAudience'
+                id='courseTarget'
+                placeholder='Sinh viên CNTT...'
+              ></textarea>
+            </div>
+            <div class='form-group'>
+              <label>Cơ hội nghề nghiệp (mỗi dòng 1 ý)</label>
+              <textarea
+                name='careerPath'
+                id='courseCareer'
+                placeholder='Frontend Developer...'
+              ></textarea>
+            </div>
+          </div>
+
+          <label>Giá trị nhận được (mỗi dòng 1 ý)</label>
+          <textarea
+            name='benefits'
+            id='courseBenefits'
+            placeholder='Làm chủ React Hook...'
+          ></textarea>
+
+          <hr />
+
+          <div class='curriculum-header'>
+            <h3>KHUNG CHƯƠNG TRÌNH</h3>
+            <button type='button' class='btn-add-module' onclick='addModule()'>+
+              Thêm Module</button>
+          </div>
+
+          <div id='curriculum-area'>
+          </div>
+
+          <div class='modal-actions'>
+            <button
+              type='button'
+              class='btn-cancel'
+              onclick='closeModal()'
+            >Hủy</button>
+            <button type='submit' class='btn-save'>Lưu khóa học</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src='/js/admin.js'></script>
+  </body>
+</html>
