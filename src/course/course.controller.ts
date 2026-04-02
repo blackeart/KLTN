@@ -8,12 +8,14 @@ import {
   Param,
   UseGuards,
   Render,
+  Patch,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CreateCourseClassDto } from './dto/create-course-class.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdateCourseDto } from './dto/update-course.dto';
 
 @ApiTags('Course Management - Quản lý khóa học')
 @Controller('courses')
@@ -101,5 +103,13 @@ export class CourseController {
 
     // Dữ liệu trả về sẽ được map trực tiếp vào các biến {{course.xxx}} trong file hbs
     return { course };
+  }
+
+  @Patch(':id')
+  async update2(
+    @Param('id') id: string,
+    @Body() updateCourseDto: UpdateCourseDto,
+  ) {
+    return this.courseService.update(+id, updateCourseDto);
   }
 }

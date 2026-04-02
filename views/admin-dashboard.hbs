@@ -35,7 +35,7 @@
                 <div class='action-btns'>
                   <button
                     class='btn-edit'
-                    onclick='editCourse({{this.id}})'
+                    onclick='openModal("edit", {{this.id}})'
                   >Sửa</button>
                   <button
                     class='btn-delete'
@@ -72,13 +72,12 @@
               placeholder='Mô tả khóa học...'
             ></textarea>
 
-            <label>Link ảnh Banner</label>
-            <input
-              type='text'
-              name='imageUrl'
-              id='courseImageUrl'
-              placeholder='https://...'
-            />
+            <label>Danh sách ảnh khóa học (mỗi dòng 1 link ảnh)</label>
+            <textarea
+              name='images'
+              id='courseImages'
+              placeholder='https://link-anh-1.jpg&#10;https://link-anh-2.jpg'
+            ></textarea>
           </div>
 
           <div class='form-row'>

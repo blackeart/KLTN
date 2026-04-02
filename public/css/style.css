@@ -1374,3 +1374,28 @@ label {
   gap: 15px;
   margin-top: 30px;
 }
+
+.admin-toolbar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+#adminSearch {
+  flex: 1;
+  margin: 0; /* Ghi đè margin cũ */
+  padding: 10px 15px;
+}
+
+#sortFilter {
+  width: 150px;
+  margin: 0;
+}
+
+.course-row:hover {
+  background-color: #f8f9fa;
+}

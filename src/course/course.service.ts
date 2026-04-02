@@ -5,6 +5,7 @@ import { CourseEntity } from '../entities/course.entity';
 import { CourseClassEntity } from '../entities/course-class.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CreateCourseClassDto } from './dto/create-course-class.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
 
 @Injectable()
 export class CourseService {
@@ -28,6 +29,21 @@ export class CourseService {
   async updateCourse(id: number, dto: Partial<CreateCourseDto>) {
     await this.courseRepo.update(id, dto);
     return this.courseRepo.findOne({ where: { id } });
+  }
+
+  // courses.service.ts
+  async update(id: number, updateCourseDto: UpdateCourseDto) {
+    // preload sẽ tìm theo id, sau đó ghi đè các field từ updateCourseDto vào
+    const course = await this.courseRepo.preload({
+      id: +id,
+      ...updateCourseDto,
+    });
+
+    if (!course) {
+      throw new NotFoundException(`Không tìm thấy khóa học có ID là ${id}`);
+    }
+
+    return this.courseRepo.save(course);
   }
 
   async deleteCourse(id: number) {

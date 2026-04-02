@@ -57,13 +57,13 @@ export class CreateCourseDto {
   careerPath: string[]; // Tương ứng với jobOpportunities trong entity
 
   @ApiProperty({
-    example: 'https://vtiacademy.edu.vn/upload/images/ba-banner.jpg',
-    description: 'URL hình ảnh chính của khóa học',
-    required: false,
+    example: ['https://link1.jpg', 'https://link2.jpg'],
+    type: [String],
   })
-  @IsString()
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  imageUrl: string; // Đổi từ images[] sang imageUrl để khớp với logic hiển thị 1 ảnh đại diện
+  images: string[];
 
   @ApiProperty({
     example: [
