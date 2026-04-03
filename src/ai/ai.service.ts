@@ -41,7 +41,7 @@ export class AiService {
 
       return embedding.values;
     } catch (error) {
-      console.error('Lỗi khi dùng bản 004:', error.message);
+      console.error('Lỗi khi dùng bản 004:', (error as Error).message);
       // Nếu vẫn lỗi, đây là phương án dự phòng (fallback) để demo không bị chết
       const backupModel = this.genAI.getGenerativeModel({
         model: 'models/embedding-001',

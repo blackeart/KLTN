@@ -102,7 +102,7 @@ function getFormData() {
 document.getElementById('courseForm').onsubmit = async (e) => {
   e.preventDefault();
   const data = getFormData();
-  const method = currentCourseId ? 'PATCH' : 'POST';
+  const method = currentCourseId ? 'PUT' : 'POST';
   const url = currentCourseId ? `/courses/${currentCourseId}` : '/courses';
 
   try {
@@ -223,3 +223,118 @@ function filterCourses() {
     }
   }
 }
+
+// 1. Toggle danh sách lớp
+function toggleClasses(courseId) {
+  const container = document.getElementById(`class-container-${courseId}`);
+  if (container.style.display === 'none') {
+    container.style.display = 'table-row';
+    renderClasses(courseId);
+  } else {
+    container.style.display = 'none';
+  }
+}
+
+// 2. Fetch và Render danh sách lớp
+async function renderClasses(courseId) {
+  const response = await fetch(`/courses/${courseId}`); // API lấy chi tiết khóa học kèm classes
+  const course = await response.json();
+  const tbody = document.getElementById(`class-list-${courseId}`);
+
+  tbody.innerHTML =
+    course.classes
+      .map(
+        (cls) => `
+        <tr>
+            <td>${cls.className}</td>
+            <td>${cls.startDate}</td>
+            <td>${cls.endDate}</td>
+            <td>${Number(cls.basePrice).toLocaleString()}đ</td>
+            <td>${cls.discountPercentage}%</td>
+            <td>
+                <button class="btn-edit" onclick="openClassModal('edit', ${courseId}, ${JSON.stringify(cls).replace(/"/g, '&quot;')})">Sửa</button>
+                <button class="btn-delete" onclick="deleteClass(${cls.id})">Xóa</button>
+            </td>
+        </tr>
+    `,
+      )
+      .join('') ||
+    '<tr><td colspan="6" style="text-align:center">Chưa có lớp nào</td></tr>';
+}
+
+// 3. Xử lý Modal Lớp học
+function openClassModal(mode, courseId, classData = null) {
+  document.getElementById('targetCourseId').value = courseId;
+  document.getElementById('classModal').style.display = 'block';
+  const form = document.getElementById('classForm');
+  form.reset();
+
+  if (mode === 'edit' && classData) {
+    document.getElementById('currentClassId').value = classData.id;
+    document.getElementById('className').value = classData.className;
+    document.getElementById('startDate').value = classData.startDate;
+    document.getElementById('endDate').value = classData.endDate;
+    document.getElementById('basePrice').value = classData.basePrice;
+    document.getElementById('discountPercentage').value =
+      classData.discountPercentage;
+  }
+}
+
+function closeClassModal() {
+  document.getElementById('classModal').style.display = 'none';
+  document.getElementById('currentClassId').value = '';
+}
+
+// 4. Submit Form Lớp học
+// admin.js
+
+document.getElementById('classForm').onsubmit = async (e) => {
+  e.preventDefault();
+
+  const courseId = document.getElementById('targetCourseId').value;
+  const classId = document.getElementById('currentClassId').value;
+
+  const payload = {
+    className: document.getElementById('className').value,
+    startDate: document.getElementById('startDate').value,
+    endDate: document.getElementById('endDate').value,
+    basePrice: Number(document.getElementById('basePrice').value),
+    discountPercentage: Number(
+      document.getElementById('discountPercentage').value,
+    ),
+    courseId: Number(courseId),
+  };
+
+  // CHỈNH SỬA TẠI ĐÂY ĐỂ KHỚP VỚI CONTROLLER CỦA BẠN
+  // 1. Nếu có classId -> Dùng phương thức PUT và đường dẫn /courses/class/:id
+  // 2. Nếu không có -> Dùng POST và đường dẫn /courses/class
+  const method = classId ? 'PUT' : 'POST';
+  const url = classId ? `/courses/class/${classId}` : '/courses/class';
+
+  console.log(`Đang gửi ${method} tới ${url}`, payload);
+
+  try {
+    const response = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      alert('Lưu thông tin lớp học thành công!');
+      closeClassModal();
+      // Gọi lại hàm render để cập nhật danh sách lớp ngay lập tức
+      if (typeof renderClasses === 'function') {
+        renderClasses(courseId);
+      } else {
+        location.reload(); // Sơ cua nếu bạn chưa viết hàm render
+      }
+    } else {
+      const err = await response.json();
+      alert('Lỗi: ' + (err.message || 'Không thể lưu lớp học'));
+    }
+  } catch (error) {
+    console.error('Lỗi kết nối:', error);
+    alert('Lỗi kết nối server!');
+  }
+};

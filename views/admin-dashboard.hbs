@@ -3,7 +3,6 @@
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>Admin - Quản lý khóa học | VTI Academy Clone</title>
-
     <link rel='stylesheet' href='/css/style.css' />
   </head>
   <body class='admin-page'>
@@ -22,6 +21,7 @@
             <th>ID</th>
             <th>Tên khóa học</th>
             <th>Mô tả</th>
+            <th>Lớp học</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -31,6 +31,14 @@
               <td>{{this.id}}</td>
               <td><b>{{this.name}}</b></td>
               <td><div class='text-truncate'>{{this.description}}</div></td>
+              <td>
+                <button
+                  class='btn-view-classes'
+                  onclick='toggleClasses({{this.id}})'
+                >
+                  Xem lớp ({{this.classes.length}})
+                </button>
+              </td>
               <td>
                 <div class='action-btns'>
                   <button
@@ -44,6 +52,49 @@
                 </div>
               </td>
             </tr>
+            <tr
+              id='class-container-{{this.id}}'
+              class='class-sub-row'
+              style='display: none; background-color: #fcfcfc;'
+            >
+              <td colspan='5'>
+                <div
+                  class='sub-table-wrapper'
+                  style='padding: 15px; border: 1px dashed #ddd; margin: 10px;'
+                >
+                  <div
+                    style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;'
+                  >
+                    <h4 style='margin: 0; color: #333;'>Danh sách lớp học:
+                      {{this.name}}</h4>
+                    <button
+                      class='btn-add-small'
+                      onclick="openClassModal('add', {{this.id}})"
+                      style='background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;'
+                    >
+                      + Mở lớp mới
+                    </button>
+                  </div>
+                  <table
+                    class='admin-table'
+                    style='font-size: 0.9em; margin-bottom: 0;'
+                  >
+                    <thead style='background: #eee;'>
+                      <tr>
+                        <th>Tên lớp</th>
+                        <th>Khai giảng</th>
+                        <th>Kết thúc</th>
+                        <th>Giá gốc</th>
+                        <th>Giảm %</th>
+                        <th>Hành động</th>
+                      </tr>
+                    </thead>
+                    <tbody id='class-list-{{this.id}}'>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
           {{/each}}
         </tbody>
       </table>
@@ -53,13 +104,11 @@
       <div class='modal-content'>
         <span class='close-btn' onclick='closeModal()'>&times;</span>
         <h2 id='modalTitle'>Thông tin khóa học</h2>
-
         <form id='courseForm'>
           <div class='form-section'>
             <label>Tên khóa học</label>
             <input
               type='text'
-              name='name'
               id='courseName'
               placeholder='VD: Khóa học ReactJS chuyên sâu'
               required
@@ -67,14 +116,12 @@
 
             <label>Mô tả ngắn</label>
             <textarea
-              name='description'
               id='courseDescription'
               placeholder='Mô tả khóa học...'
             ></textarea>
 
             <label>Danh sách ảnh khóa học (mỗi dòng 1 link ảnh)</label>
             <textarea
-              name='images'
               id='courseImages'
               placeholder='https://link-anh-1.jpg&#10;https://link-anh-2.jpg'
             ></textarea>
@@ -84,7 +131,6 @@
             <div class='form-group'>
               <label>Đối tượng tham gia (mỗi dòng 1 ý)</label>
               <textarea
-                name='targetAudience'
                 id='courseTarget'
                 placeholder='Sinh viên CNTT...'
               ></textarea>
@@ -92,7 +138,6 @@
             <div class='form-group'>
               <label>Cơ hội nghề nghiệp (mỗi dòng 1 ý)</label>
               <textarea
-                name='careerPath'
                 id='courseCareer'
                 placeholder='Frontend Developer...'
               ></textarea>
@@ -101,21 +146,17 @@
 
           <label>Giá trị nhận được (mỗi dòng 1 ý)</label>
           <textarea
-            name='benefits'
             id='courseBenefits'
             placeholder='Làm chủ React Hook...'
           ></textarea>
 
           <hr />
-
           <div class='curriculum-header'>
             <h3>KHUNG CHƯƠNG TRÌNH</h3>
             <button type='button' class='btn-add-module' onclick='addModule()'>+
               Thêm Module</button>
           </div>
-
-          <div id='curriculum-area'>
-          </div>
+          <div id='curriculum-area'></div>
 
           <div class='modal-actions'>
             <button
@@ -124,6 +165,67 @@
               onclick='closeModal()'
             >Hủy</button>
             <button type='submit' class='btn-save'>Lưu khóa học</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id='classModal' class='modal'>
+      <div class='modal-content'>
+        <span class='close-btn' onclick='closeClassModal()'>&times;</span>
+        <h2 id='classModalTitle'>Thông tin lớp học</h2>
+        <form id='classForm'>
+          <input type='hidden' id='targetCourseId' />
+          <input type='hidden' id='currentClassId' />
+
+          <label>Tên lớp</label>
+          <input
+            type='text'
+            id='className'
+            placeholder='VD: JAVA-2401'
+            required
+          />
+
+          <div class='form-row'>
+            <div class='form-group'>
+              <label>Ngày bắt đầu</label>
+              <input type='date' id='startDate' required />
+            </div>
+            <div class='form-group'>
+              <label>Ngày kết thúc</label>
+              <input type='date' id='endDate' required />
+            </div>
+          </div>
+
+          <div class='form-row'>
+            <div class='form-group'>
+              <label>Học phí gốc (VNĐ)</label>
+              <input
+                type='number'
+                id='basePrice'
+                placeholder='10000000'
+                required
+              />
+            </div>
+            <div class='form-group'>
+              <label>Giảm giá (%)</label>
+              <input
+                type='number'
+                id='discountPercentage'
+                value='0'
+                min='0'
+                max='100'
+              />
+            </div>
+          </div>
+
+          <div class='modal-actions'>
+            <button
+              type='button'
+              class='btn-cancel'
+              onclick='closeClassModal()'
+            >Hủy</button>
+            <button type='submit' class='btn-save'>Lưu lớp học</button>
           </div>
         </form>
       </div>
