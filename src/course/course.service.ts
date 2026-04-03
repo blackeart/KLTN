@@ -85,16 +85,48 @@ export class CourseService {
   }
 
   // --- QUẢN LÝ LỚP HỌC (COURSE CLASS) ---
+  // async createClass(dto: CreateCourseClassDto) {
+  //   const { courseId, ...classData } = dto;
+  //   const course = await this.courseRepo.findOne({ where: { id: courseId } });
+  //   if (!course) throw new NotFoundException('Không tìm thấy khóa học gốc');
+
+  //   const newClass = this.classRepo.create({
+  //     ...classData,
+  //     course,
+  //   });
+  //   return await this.classRepo.save(newClass);
+  // }
+
   async createClass(dto: CreateCourseClassDto) {
     const { courseId, ...classData } = dto;
+
+    // 1. Kiểm tra khóa học gốc
     const course = await this.courseRepo.findOne({ where: { id: courseId } });
     if (!course) throw new NotFoundException('Không tìm thấy khóa học gốc');
 
+    // 2. Tạo và lưu lớp học mới
     const newClass = this.classRepo.create({
       ...classData,
       course,
     });
-    return await this.classRepo.save(newClass);
+    const savedClass = await this.classRepo.save(newClass);
+
+    // 3. CẬP NHẬT VECTOR CHO COURSE
+    // Sau khi lớp đã lưu vào DB, ta bảo AI Service đọc lại Course này
+    // để lấy đầy đủ danh sách lớp (bao gồm cả lớp vừa tạo) và tạo Vector mới.
+    try {
+      await this.aiService.syncCourseToVector(courseId);
+      console.log(
+        `[AI Sync] Đã cập nhật lại Vector cho Course ID: ${courseId} do có lớp mới.`,
+      );
+    } catch (error) {
+      // Log lỗi nhưng không làm gián đoạn việc trả về kết quả cho User
+      console.error(
+        `[AI Sync Error] Không thể cập nhật Vector: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+
+    return savedClass;
   }
 
   async deleteClass(id: number) {
@@ -142,23 +174,71 @@ export class CourseService {
   }
 
   // Cập nhật thông tin lớp học
+  // async updateClass(id: number, dto: Partial<CreateCourseClassDto>) {
+  //   const { courseId, ...updateData } = dto;
+
+  //   const courseClass = await this.classRepo.findOne({ where: { id } });
+  //   if (!courseClass)
+  //     throw new NotFoundException('Không tìm thấy lớp học để sửa');
+
+  //   // Nếu có đổi khóa học gốc (courseId)
+  //   if (courseId) {
+  //     const course = await this.courseRepo.findOne({ where: { id: courseId } });
+  //     if (!course) throw new NotFoundException('Khóa học mới không tồn tại');
+  //     courseClass.course = course;
+  //   }
+
+  //   // Ghi đè các dữ liệu mới
+  //   Object.assign(courseClass, updateData);
+  //   return await this.classRepo.save(courseClass);
+  // }
+
   async updateClass(id: number, dto: Partial<CreateCourseClassDto>) {
     const { courseId, ...updateData } = dto;
 
-    const courseClass = await this.classRepo.findOne({ where: { id } });
+    // 1. Tìm lớp cũ và lấy kèm thông tin Course hiện tại
+    const courseClass = await this.classRepo.findOne({
+      where: { id },
+      relations: ['course'],
+    });
     if (!courseClass)
       throw new NotFoundException('Không tìm thấy lớp học để sửa');
 
-    // Nếu có đổi khóa học gốc (courseId)
-    if (courseId) {
-      const course = await this.courseRepo.findOne({ where: { id: courseId } });
-      if (!course) throw new NotFoundException('Khóa học mới không tồn tại');
-      courseClass.course = course;
+    const oldCourseId = courseClass.course?.id;
+
+    // 2. Nếu có đổi khóa học gốc (chuyển lớp sang khóa khác)
+    if (courseId && courseId !== oldCourseId) {
+      const newCourse = await this.courseRepo.findOne({
+        where: { id: courseId },
+      });
+      if (!newCourse) throw new NotFoundException('Khóa học mới không tồn tại');
+      courseClass.course = newCourse;
     }
 
-    // Ghi đè các dữ liệu mới
+    // 3. Ghi đè dữ liệu và lưu
     Object.assign(courseClass, updateData);
-    return await this.classRepo.save(courseClass);
+    const savedClass = await this.classRepo.save(courseClass);
+
+    // 4. CẬP NHẬT VECTOR (EMBEDDING)
+    try {
+      // Luôn cập nhật khóa học hiện tại của lớp
+      await this.aiService.syncCourseToVector(courseClass.course.id);
+
+      // Nếu lớp này vừa được chuyển từ Khóa học A sang Khóa học B
+      // thì phải cập nhật lại cả Khóa học A (vì nó vừa mất đi 1 lớp)
+      if (courseId && oldCourseId && courseId !== oldCourseId) {
+        await this.aiService.syncCourseToVector(oldCourseId);
+      }
+
+      console.log(`[AI Sync] Đã cập nhật Embedding thành công.`);
+    } catch (error) {
+      console.error(
+        `[AI Sync Error] Lỗi cập nhật Vector:`,
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+
+    return savedClass;
   }
 
   async findOne(id: number) {
