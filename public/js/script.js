@@ -78,18 +78,53 @@ function appendMessage(role, text) {
 }
 
 // Hàm gửi tin nhắn lên Server
+// async function sendMessage() {
+//   const text = chatInput.value.trim();
+//   if (!text) return;
+
+//   appendMessage('user', text); // Hiển thị tin nhắn người dùng
+//   chatInput.value = '';
+
+//   // Hiển thị trạng thái "đang trả lời..."
+//   const loadingDiv = document.createElement('div');
+//   loadingDiv.className = 'message bot';
+//   loadingDiv.innerText = 'AI đang suy nghĩ...';
+//   chatBody.appendChild(loadingDiv);
+
+//   try {
+//     const response = await fetch('/chat/ask', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({ message: text }),
+//     });
+
+//     const result = await response.json();
+//     chatBody.removeChild(loadingDiv); // Xóa dòng đang chờ
+
+//     if (result.success) {
+//       appendMessage('bot', result.data);
+//     } else {
+//       appendMessage('bot', 'Có lỗi xảy ra, bạn thử lại nhé!');
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     chatBody.removeChild(loadingDiv);
+//     appendMessage('bot', 'Không kết nối được với Server.');
+//   }
+// }
 async function sendMessage() {
   const text = chatInput.value.trim();
   if (!text) return;
 
-  appendMessage('user', text); // Hiển thị tin nhắn người dùng
+  appendMessage('user', text);
   chatInput.value = '';
 
-  // Hiển thị trạng thái "đang trả lời..."
+  // --- PHẦN THAY ĐỔI: Tạo hiệu ứng đang nhập ---
   const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'message bot';
-  loadingDiv.innerText = 'AI đang suy nghĩ...';
+  loadingDiv.className = 'message bot typing-indicator'; // Thêm class typing-indicator
+  loadingDiv.innerHTML = '<span></span><span></span><span></span>'; // 3 dấu chấm
   chatBody.appendChild(loadingDiv);
+  chatBody.scrollTop = chatBody.scrollHeight; // Cuộn xuống dưới cùng
 
   try {
     const response = await fetch('/chat/ask', {
@@ -99,7 +134,7 @@ async function sendMessage() {
     });
 
     const result = await response.json();
-    chatBody.removeChild(loadingDiv); // Xóa dòng đang chờ
+    chatBody.removeChild(loadingDiv); // Xóa hiệu ứng sau khi có kết quả
 
     if (result.success) {
       appendMessage('bot', result.data);
@@ -108,7 +143,7 @@ async function sendMessage() {
     }
   } catch (error) {
     console.error(error);
-    chatBody.removeChild(loadingDiv);
+    if (loadingDiv.parentNode) chatBody.removeChild(loadingDiv);
     appendMessage('bot', 'Không kết nối được với Server.');
   }
 }
