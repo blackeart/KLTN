@@ -6,6 +6,7 @@ import { CourseClassEntity } from '../entities/course-class.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CreateCourseClassDto } from './dto/create-course-class.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { AiService } from 'src/ai/ai.service';
 
 @Injectable()
 export class CourseService {
@@ -14,12 +15,15 @@ export class CourseService {
     private courseRepo: Repository<CourseEntity>,
     @InjectRepository(CourseClassEntity)
     private classRepo: Repository<CourseClassEntity>,
+    private aiService: AiService, // Giả sử có AI Service để sync embedding
   ) {}
 
   // --- QUẢN LÝ KHÓA HỌC (COURSE) ---
   async createCourse(dto: CreateCourseDto) {
     const course = this.courseRepo.create(dto);
-    return await this.courseRepo.save(course);
+    const newCourse = await this.courseRepo.save(course);
+    await this.aiService.syncCourseToVector(newCourse.id);
+    return newCourse;
   }
 
   async findAllCourses() {
@@ -28,12 +32,26 @@ export class CourseService {
 
   async updateCourse(id: number, dto: Partial<CreateCourseDto>) {
     await this.courseRepo.update(id, dto);
+    await this.aiService.syncCourseToVector(id);
     return this.courseRepo.findOne({ where: { id } });
   }
 
   // courses.service.ts
+  // async update(id: number, updateCourseDto: UpdateCourseDto) {
+  //   // preload sẽ tìm theo id, sau đó ghi đè các field từ updateCourseDto vào
+  //   const course = await this.courseRepo.preload({
+  //     id: +id,
+  //     ...updateCourseDto,
+  //   });
+
+  //   if (!course) {
+  //     throw new NotFoundException(`Không tìm thấy khóa học có ID là ${id}`);
+  //   }
+
+  //   return this.courseRepo.save(course);
+  // }
   async update(id: number, updateCourseDto: UpdateCourseDto) {
-    // preload sẽ tìm theo id, sau đó ghi đè các field từ updateCourseDto vào
+    // 1. Preload để chuẩn bị dữ liệu cập nhật
     const course = await this.courseRepo.preload({
       id: +id,
       ...updateCourseDto,
@@ -43,7 +61,23 @@ export class CourseService {
       throw new NotFoundException(`Không tìm thấy khóa học có ID là ${id}`);
     }
 
-    return this.courseRepo.save(course);
+    // 2. Lưu vào Database trước để đảm bảo dữ liệu mới nhất đã nằm trong bảng
+    const savedCourse = await this.courseRepo.save(course);
+
+    // 3. Kích hoạt AI đồng bộ lại Vector (Embedding)
+    // Việc này giúp AI "đọc" lại toàn bộ thông tin mới nhất bao gồm cả Course và các Class liên quan
+    try {
+      await this.aiService.syncCourseToVector(savedCourse.id);
+      console.log(`[AI Sync] Đã cập nhật Vector cho khóa học ID: ${id}`);
+    } catch (error) {
+      // Chúng ta dùng try-catch ở đây để nếu AI lỗi thì DB vẫn đã lưu xong, không làm chết luồng chính
+      console.error(
+        `[AI Sync Error] Lỗi khi tạo embedding cho khóa học ${id}:`,
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+
+    return savedCourse;
   }
 
   async deleteCourse(id: number) {

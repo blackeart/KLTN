@@ -16,11 +16,15 @@ import { CreateCourseClassDto } from './dto/create-course-class.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { AiService } from 'src/ai/ai.service';
 
 @ApiTags('Course Management - Quản lý khóa học')
 @Controller('courses')
 export class CourseController {
-  constructor(private readonly courseService: CourseService) {}
+  constructor(
+    private readonly courseService: CourseService,
+    private readonly aiService: AiService,
+  ) {}
 
   @Get('view')
   @Render('course') // Render file course.hbs
@@ -111,5 +115,16 @@ export class CourseController {
     @Body() updateCourseDto: UpdateCourseDto,
   ) {
     return this.courseService.update(+id, updateCourseDto);
+  }
+
+  @Post('sync-ai')
+  @ApiOperation({ summary: 'Đồng bộ toàn bộ khóa học sang Vector DB cho AI' })
+  async syncAllToAi() {
+    const courses = await this.courseService.findAllCourses();
+    for (const course of courses) {
+      // Gọi hàm sync mà chúng ta đã viết trong AiService
+      await this.aiService.syncCourseToVector(course.id);
+    }
+    return { message: `Đã đồng bộ thành công ${courses.length} khóa học!` };
   }
 }

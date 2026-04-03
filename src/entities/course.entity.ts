@@ -40,6 +40,6 @@ export class CourseEntity {
   @OneToMany(() => CourseClassEntity, (courseClass) => courseClass.course)
   classes: CourseClassEntity[];
 
-  @Column({ type: 'vector', length: 768, nullable: true })
+  @Column({ type: 'vector', precision: 768, nullable: true })
   embedding: number[];
 }

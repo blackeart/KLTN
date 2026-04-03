@@ -27,6 +27,13 @@ export class CourseClassEntity {
   @Column({ type: 'int', default: 0, name: 'discount_percentage' })
   discountPercentage: number;
 
+  @Column({
+    type: 'vector',
+    length: 768,
+    nullable: true,
+  })
+  embedding: number[];
+
   @ManyToOne(() => CourseEntity, (course) => course.classes, {
     onDelete: 'CASCADE',
   })
