@@ -1449,3 +1449,100 @@ label {
   max-width: 80%;
   align-self: flex-start;
 }
+
+.class-list-section {
+  padding: 50px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  text-align: center;
+  color: #00338d;
+  font-weight: bold;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.class-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.class-table thead tr {
+  background-color: #0026a7; /* Màu xanh đậm như ảnh */
+  color: #ffffff;
+  text-align: left;
+}
+
+.class-table th,
+.class-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e1e8f0;
+  font-size: 14px;
+}
+
+.class-table tbody tr:nth-child(even) {
+  background-color: #f0f7ff; /* Sọc xanh nhạt */
+}
+
+.class-table td a {
+  color: #0056b3;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn-register-small {
+  background: white;
+  border: 1px solid #0056b3;
+  color: #0056b3;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.btn-register-small:hover {
+  background: #0056b3;
+  color: white;
+}
+
+.schedule-selector {
+  display: flex;
+  justify-content: 间-between;
+  gap: 5px;
+  margin-bottom: 15px;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.day-checkbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.day-checkbox input[type='checkbox'] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.day-checkbox label {
+  font-size: 12px;
+  margin-top: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #555;
+}

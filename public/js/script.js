@@ -224,3 +224,50 @@ if (result.success) {
   chatBody.appendChild(botMsgDiv);
   typeWriter(result.data, botMsgDiv); // Gọi hiệu ứng chạy chữ
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchClasses();
+});
+
+async function fetchClasses() {
+  const tableBody = document.getElementById('class-table-body');
+
+  try {
+    const response = await fetch('/courses/class/all');
+    const classes = await response.json();
+
+    if (!classes || classes.length === 0) {
+      tableBody.innerHTML =
+        '<tr><td colspan="7" style="text-align: center;">Hiện chưa có lớp học nào khả dụng.</td></tr>';
+      return;
+    }
+
+    tableBody.innerHTML = ''; // Xóa dòng "Đang tải"
+
+    classes.forEach((cls) => {
+      const row = document.createElement('tr');
+
+      // Tính toán giá sau ưu đãi (nếu cần show học phí)
+      const finalPrice = cls.basePrice
+        ? new Intl.NumberFormat('vi-VN').format(
+            cls.basePrice * (1 - cls.discountPercentage / 100),
+          ) + 'đ'
+        : 'Liên hệ';
+
+      row.innerHTML = `
+        <td><a href="#">${cls.className}</a></td>
+        <td>${cls.schedule || '2-4-6'}</td>
+        <td>${new Date(cls.startDate).toLocaleDateString('vi-VN')}</td>
+        <td>Online + Offline</td>
+        <td>Cả nước</td>
+        <td>${finalPrice}</td>
+        <td><button class="btn-register-small">Đăng ký</button></td>
+      `;
+      tableBody.appendChild(row);
+    });
+  } catch (error) {
+    console.error('Lỗi fetch lớp học:', error);
+    tableBody.innerHTML =
+      '<tr><td colspan="7" style="text-align: center; color: red;">Lỗi tải dữ liệu.</td></tr>';
+  }
+}

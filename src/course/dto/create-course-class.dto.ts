@@ -21,6 +21,11 @@ export class CreateCourseClassDto {
   @IsDateString()
   endDate: string;
 
+  @ApiProperty({ example: 'Thứ 2-4-6' })
+  @IsString()
+  @IsOptional()
+  schedule: string;
+
   @ApiProperty({ example: 10000000 })
   @IsNumber()
   @Min(0)

@@ -21,6 +21,9 @@ export class CourseClassEntity {
   @Column({ type: 'date', name: 'end_date' })
   endDate: string;
 
+  @Column({ nullable: true, default: '2-4-6' })
+  schedule: string;
+
   @Column({ type: 'decimal', precision: 12, scale: 0, name: 'base_price' })
   basePrice: number;
 

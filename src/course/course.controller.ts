@@ -45,6 +45,36 @@ export class CourseController {
     return this.courseService.findAllCourses();
   }
 
+  @Get('class/view')
+  @Render('class-list')
+  async getView() {
+    // 1. Lấy dữ liệu từ database
+    const classes = await this.courseService.findAllClasses();
+
+    // 2. Format lại dữ liệu (Ngày tháng, tiền tệ) để hiển thị đẹp ngay trên server
+    const formattedClasses = classes.map((cls) => ({
+      ...cls,
+      // Format ngày: 16/04/2026
+      displayDate: new Date(cls.startDate).toLocaleDateString('vi-VN'),
+      // Format tiền: 5.000.000đ hoặc "Liên hệ"
+      displayPrice: cls.basePrice
+        ? new Intl.NumberFormat('vi-VN').format(
+            cls.basePrice * (1 - cls.discountPercentage / 100),
+          ) + 'đ'
+        : 'Liên hệ',
+      // Giả định các giá trị mặc định nếu DB chưa có cột này
+      schedule: cls.schedule,
+      format: 'Online + Offline',
+      location: 'Cả nước',
+    }));
+
+    // 3. Trả về object cho file .hbs
+    return {
+      classList: formattedClasses,
+      title: 'Lịch khai giảng - VTI Academy',
+    };
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Xem chi tiết khóa học và các lớp học' })
   findOne(@Param('id') id: number) {

@@ -298,7 +298,8 @@ TRẢ LỜI:`;
       course.classes.forEach((cls) => {
         const finalPrice =
           Number(cls.basePrice) * (1 - cls.discountPercentage / 100);
-        text += `- Lớp ${cls.className}: Khai giảng ${cls.startDate}. Học phí gốc ${cls.basePrice}đ, ưu đãi còn ${finalPrice}đ. \n`;
+        // text += `- Lớp ${cls.className}: Khai giảng ${cls.startDate}. Học phí gốc ${cls.basePrice}đ, ưu đãi còn ${finalPrice}đ. \n`;
+        text += `- Lớp ${cls.className}: Lịch học ${cls.schedule || 'liên hệ'}, Khai giảng ${new Date(cls.startDate).toLocaleDateString('vi-VN')}. Học phí gốc ${cls.basePrice}đ, ưu đãi còn ${finalPrice}đ. \n`;
       });
     }
 

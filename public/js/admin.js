@@ -263,20 +263,66 @@ async function renderClasses(courseId) {
 }
 
 // 3. Xử lý Modal Lớp học
+// function openClassModal(mode, courseId, classData = null) {
+//   document.getElementById('targetCourseId').value = courseId;
+//   document.getElementById('classModal').style.display = 'block';
+//   const form = document.getElementById('classForm');
+//   form.reset();
+
+//   if (mode === 'edit' && classData) {
+//     document.getElementById('currentClassId').value = classData.id;
+//     document.getElementById('className').value = classData.className;
+//     document.getElementById('startDate').value = classData.startDate;
+//     document.getElementById('endDate').value = classData.endDate;
+//     document.getElementById('basePrice').value = classData.basePrice;
+//     document.getElementById('discountPercentage').value =
+//       classData.discountPercentage;
+//   }
+// }
+
 function openClassModal(mode, courseId, classData = null) {
   document.getElementById('targetCourseId').value = courseId;
   document.getElementById('classModal').style.display = 'block';
   const form = document.getElementById('classForm');
+
+  // 1. Reset form về trạng thái trống
   form.reset();
+  document.getElementById('currentClassId').value = '';
+
+  // 2. Quan trọng: Reset toàn bộ checkbox lịch học về trạng thái chưa tích
+  document
+    .querySelectorAll('input[name="scheduleDay"]')
+    .forEach((cb) => (cb.checked = false));
 
   if (mode === 'edit' && classData) {
     document.getElementById('currentClassId').value = classData.id;
     document.getElementById('className').value = classData.className;
-    document.getElementById('startDate').value = classData.startDate;
-    document.getElementById('endDate').value = classData.endDate;
+
+    // Format lại ngày tháng (nếu dữ liệu từ DB là định dạng ISO YYYY-MM-DD...)
+    if (classData.startDate)
+      document.getElementById('startDate').value =
+        classData.startDate.split('T')[0];
+    if (classData.endDate)
+      document.getElementById('endDate').value =
+        classData.endDate.split('T')[0];
+
     document.getElementById('basePrice').value = classData.basePrice;
     document.getElementById('discountPercentage').value =
       classData.discountPercentage;
+
+    // --- BỔ SUNG: Tích lại các checkbox dựa trên chuỗi schedule (VD: "2-4-6") ---
+    if (classData.schedule) {
+      const days = classData.schedule.split('-'); // Tách "2-4-6" thành ["2", "4", "6"]
+      days.forEach((day) => {
+        const checkbox = document.querySelector(
+          `input[name="scheduleDay"][value="${day}"]`,
+        );
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+    }
+    // --------------------------------------------------------------------------
   }
 }
 
@@ -288,16 +334,75 @@ function closeClassModal() {
 // 4. Submit Form Lớp học
 // admin.js
 
+// document.getElementById('classForm').onsubmit = async (e) => {
+//   e.preventDefault();
+
+//   const courseId = document.getElementById('targetCourseId').value;
+//   const classId = document.getElementById('currentClassId').value;
+
+//   const payload = {
+//     className: document.getElementById('className').value,
+//     startDate: document.getElementById('startDate').value,
+//     endDate: document.getElementById('endDate').value,
+//     basePrice: Number(document.getElementById('basePrice').value),
+//     discountPercentage: Number(
+//       document.getElementById('discountPercentage').value,
+//     ),
+//     courseId: Number(courseId),
+//   };
+
+//   // CHỈNH SỬA TẠI ĐÂY ĐỂ KHỚP VỚI CONTROLLER CỦA BẠN
+//   // 1. Nếu có classId -> Dùng phương thức PUT và đường dẫn /courses/class/:id
+//   // 2. Nếu không có -> Dùng POST và đường dẫn /courses/class
+//   const method = classId ? 'PUT' : 'POST';
+//   const url = classId ? `/courses/class/${classId}` : '/courses/class';
+
+//   console.log(`Đang gửi ${method} tới ${url}`, payload);
+
+//   try {
+//     const response = await fetch(url, {
+//       method: method,
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(payload),
+//     });
+
+//     if (response.ok) {
+//       alert('Lưu thông tin lớp học thành công!');
+//       closeClassModal();
+//       // Gọi lại hàm render để cập nhật danh sách lớp ngay lập tức
+//       if (typeof renderClasses === 'function') {
+//         renderClasses(courseId);
+//       } else {
+//         location.reload(); // Sơ cua nếu bạn chưa viết hàm render
+//       }
+//     } else {
+//       const err = await response.json();
+//       alert('Lỗi: ' + (err.message || 'Không thể lưu lớp học'));
+//     }
+//   } catch (error) {
+//     console.error('Lỗi kết nối:', error);
+//     alert('Lỗi kết nối server!');
+//   }
+// };
+
 document.getElementById('classForm').onsubmit = async (e) => {
   e.preventDefault();
 
   const courseId = document.getElementById('targetCourseId').value;
   const classId = document.getElementById('currentClassId').value;
 
+  // --- BỔ SUNG: Lấy dữ liệu từ checkbox lịch học ---
+  const selectedDays = Array.from(
+    document.querySelectorAll('input[name="scheduleDay"]:checked'),
+  ).map((cb) => cb.value);
+  const scheduleString = selectedDays.join('-'); // Kết quả: "2-4-6" hoặc "7-CN"
+  // ------------------------------------------------
+
   const payload = {
     className: document.getElementById('className').value,
     startDate: document.getElementById('startDate').value,
     endDate: document.getElementById('endDate').value,
+    schedule: scheduleString, // ĐƯA DỮ LIỆU VÀO ĐÂY
     basePrice: Number(document.getElementById('basePrice').value),
     discountPercentage: Number(
       document.getElementById('discountPercentage').value,
@@ -305,13 +410,10 @@ document.getElementById('classForm').onsubmit = async (e) => {
     courseId: Number(courseId),
   };
 
-  // CHỈNH SỬA TẠI ĐÂY ĐỂ KHỚP VỚI CONTROLLER CỦA BẠN
-  // 1. Nếu có classId -> Dùng phương thức PUT và đường dẫn /courses/class/:id
-  // 2. Nếu không có -> Dùng POST và đường dẫn /courses/class
   const method = classId ? 'PUT' : 'POST';
   const url = classId ? `/courses/class/${classId}` : '/courses/class';
 
-  console.log(`Đang gửi ${method} tới ${url}`, payload);
+  console.log(`Đang gửi ${method} tới ${url}`, payload); // Hãy check Console xem có 'schedule' chưa
 
   try {
     const response = await fetch(url, {
@@ -323,12 +425,7 @@ document.getElementById('classForm').onsubmit = async (e) => {
     if (response.ok) {
       alert('Lưu thông tin lớp học thành công!');
       closeClassModal();
-      // Gọi lại hàm render để cập nhật danh sách lớp ngay lập tức
-      if (typeof renderClasses === 'function') {
-        renderClasses(courseId);
-      } else {
-        location.reload(); // Sơ cua nếu bạn chưa viết hàm render
-      }
+      location.reload();
     } else {
       const err = await response.json();
       alert('Lỗi: ' + (err.message || 'Không thể lưu lớp học'));
