@@ -134,21 +134,46 @@ export class CourseService {
   }
 
   // Lấy chi tiết kèm tính toán giá
-  async getCourseDetails(id: number) {
-    const course = await this.courseRepo.findOne({
-      where: { id },
-      relations: ['classes'],
-    });
+  // async getCourseDetails(id: number) {
+  //   const course = await this.courseRepo.findOne({
+  //     where: { id },
+  //     relations: ['classes'],
+  //   });
 
-    if (!course) throw new NotFoundException('Khóa học không tồn tại');
+  //   if (!course) throw new NotFoundException('Khóa học không tồn tại');
 
-    // Map thêm trường final_price để AI dễ đọc
-    const classesWithFinalPrice = course.classes.map((c) => ({
-      ...c,
-      finalPrice: Number(c.basePrice) * (1 - c.discountPercentage / 100),
-    }));
+  //   // Map thêm trường final_price để AI dễ đọc
+  //   const classesWithFinalPrice = course.classes.map((c) => ({
+  //     ...c,
+  //     finalPrice: Number(c.basePrice) * (1 - c.discountPercentage / 100),
+  //   }));
 
-    return { ...course, classes: classesWithFinalPrice };
+  //   return { ...course, classes: classesWithFinalPrice };
+  // }
+
+  // course.service.ts
+  // course.service.ts
+  async getCourseDetails(id: number, startDate?: string, endDate?: string) {
+    const query = this.courseRepo
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.classes', 'class')
+      .where('course.id = :id', { id });
+
+    // Nếu có truyền ngày vào thì lọc ngay trong Query
+    if (startDate && endDate) {
+      query.andWhere('class.startDate BETWEEN :start AND :end', {
+        start: startDate,
+        end: endDate,
+      });
+    } else if (startDate) {
+      query.andWhere('class.startDate >= :start', { start: startDate });
+    }
+
+    const course = await query.getOne();
+    if (!course) throw new NotFoundException('Không tìm thấy khóa học');
+
+    // Logic tính finalPrice giữ nguyên...
+    return course;
   }
 
   async findAllClasses() {
@@ -247,5 +272,42 @@ export class CourseService {
       throw new NotFoundException(`Không tìm thấy khóa học với id ${id}`);
     }
     return course;
+  }
+
+  // course.service.ts
+  async searchCourses(name?: string, startDate?: string, endDate?: string) {
+    const query = this.courseRepo
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.classes', 'class');
+
+    if (name) query.andWhere('course.name ILIKE :name', { name: `%${name}%` });
+
+    const courses = await query.getMany();
+
+    if (!startDate && !endDate) return courses;
+
+    const filteredResult = courses
+      .map((course) => {
+        const originalCount = course.classes.length;
+
+        course.classes = course.classes.filter((c) => {
+          const d = c.startDate.toString();
+          // LOG ĐỂ KIỂM TRA SO SÁNH
+          console.log(`So sánh: ${d} với Start: ${startDate}, End: ${endDate}`);
+
+          if (startDate && endDate) return d >= startDate && d <= endDate;
+          if (startDate) return d >= startDate;
+          if (endDate) return d <= endDate;
+          return true;
+        });
+
+        console.log(
+          `Khóa ${course.name}: Trước lọc ${originalCount} lớp, sau lọc ${course.classes.length} lớp`,
+        );
+        return course;
+      })
+      .filter((course) => course.classes.length > 0);
+
+    return filteredResult;
   }
 }

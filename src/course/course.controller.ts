@@ -9,6 +9,7 @@ import {
   UseGuards,
   Render,
   Patch,
+  Query,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -31,6 +32,20 @@ export class CourseController {
   async getCourseView() {
     const courses = await this.courseService.findAllCourses();
     return { courses }; // Truyền danh sách khóa học sang file .hbs
+  }
+
+  @Get('search')
+  async search(
+    @Query('name') name?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    // Biến chuỗi trống thành undefined để Service bỏ qua filter
+    const n = name?.trim() || undefined;
+    const s = startDate?.trim() || undefined;
+    const e = endDate?.trim() || undefined;
+
+    return await this.courseService.searchCourses(n, s, e);
   }
 
   @Post()

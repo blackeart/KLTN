@@ -234,6 +234,22 @@ function toggleClasses(courseId) {
     container.style.display = 'none';
   }
 }
+// function toggleClasses(courseId) {
+//   const container = document.getElementById(`class-container-${courseId}`);
+//   if (!container) return;
+
+//   // Kiểm tra trạng thái hiển thị hiện tại
+//   const isHidden =
+//     container.style.display === 'none' || container.style.display === '';
+
+//   if (isHidden) {
+//     container.style.display = 'table-row';
+//     // TUYỆT ĐỐI KHÔNG gọi renderClasses(courseId) ở đây nữa
+//     // vì dữ liệu đã được renderClassesRows vẽ sẵn lúc bạn tìm kiếm rồi.
+//   } else {
+//     container.style.display = 'none';
+//   }
+// }
 
 // 2. Fetch và Render danh sách lớp
 async function renderClasses(courseId) {
@@ -435,3 +451,136 @@ document.getElementById('classForm').onsubmit = async (e) => {
     alert('Lỗi kết nối server!');
   }
 };
+
+// Hàm debounce để tránh gọi API quá nhiều khi đang gõ phím
+let typingTimer;
+function filterData() {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(async () => {
+    const name = document.getElementById('search-name').value;
+    const startDate = document.getElementById('search-start').value;
+    const endDate = document.getElementById('search-end').value;
+
+    // Xây dựng URL query
+    const params = new URLSearchParams({
+      name: name,
+      startDate: startDate,
+      endDate: endDate,
+    });
+
+    try {
+      const response = await fetch(`/courses/search?${params.toString()}`);
+      const courses = await response.json();
+      renderTable(courses); // Hàm này dùng để vẽ lại <tbody> của bạn
+    } catch (err) {
+      console.error('Lỗi lọc dữ liệu:', err);
+    }
+  }, 300); // Đợi 300ms sau khi ngừng gõ mới gọi API
+}
+
+function resetFilter() {
+  document.getElementById('search-name').value = '';
+  document.getElementById('search-start').value = '';
+  document.getElementById('search-end').value = '';
+  filterData();
+}
+
+// Cấu trúc lại hàm renderTable để dùng chung cho cả load lần đầu và search
+// admin.js
+// admin.js
+function renderTable(courses) {
+  const tbody = document.querySelector('.admin-table tbody');
+  const data = Array.isArray(courses) ? courses : [];
+
+  if (data.length === 0) {
+    tbody.innerHTML =
+      '<tr><td colspan="5" class="text-center p-4">Không tìm thấy khóa học nào.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data
+    .map((course) => {
+      const id = course.id;
+      const numClasses = course.classes ? course.classes.length : 0;
+
+      return `
+            <tr>
+                <td>${id}</td>
+                <td><b>${course.name}</b></td>
+                <td><div class='text-truncate' style="max-width: 250px;">${course.description || ''}</div></td>
+                <td>
+                    <button class='btn-view-classes' onclick='toggleClasses(${id})'>
+                        Xem lớp (${numClasses})
+                    </button>
+                </td>
+                <td>
+                    <div class='action-btns'>
+                        <button class='btn-edit' onclick='openModal("edit", ${id})'>Sửa</button>
+                        <button class='btn-delete' onclick='deleteCourse(${id})'>Xóa</button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr id='class-container-${id}' class='class-sub-row' style='display: none; background-color: #fcfcfc;'>
+                <td colspan='5'>
+                    <div class='sub-table-wrapper' style='padding: 15px; border: 1px dashed #ddd; margin: 10px;'>
+                        <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;'>
+                            <h4 style='margin: 0; color: #333;'>Danh sách lớp: ${course.name}</h4>
+                            <button class='btn-add-small' onclick="openClassModal('add', ${id})" 
+                                    style='background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;'>
+                                + Mở lớp mới
+                            </button>
+                        </div>
+                        <table class='admin-table' style='font-size: 0.9em; margin-bottom: 0;'>
+                            <thead style='background: #eee;'>
+                                <tr>
+                                    <th>Tên lớp</th>
+                                    <th>Khai giảng</th>
+                                    <th>Kết thúc</th>
+                                    <th>Giá gốc</th>
+                                    <th>Giảm %</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id='class-list-${id}'>
+                                ${renderClassesRows(course.classes, id)}
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        `;
+    })
+    .join('');
+}
+
+// Hàm phụ để vẽ các dòng lớp học bên trong
+function renderClassesRows(classes, courseId) {
+  // Nếu không có lớp nào (sau khi đã lọc từ Backend)
+  if (!classes || classes.length === 0) {
+    return `<tr><td colspan="6" class="text-center p-3 text-muted">Không có lớp học nào phù hợp.</td></tr>`;
+  }
+
+  // CHỈ lặp qua mảng classes mà Backend gửi về
+  return classes
+    .map((c) => {
+      // Ép kiểu số để format tiền cho đẹp (nếu cần)
+      const price = Number(c.basePrice).toLocaleString('vi-VN');
+
+      return `
+      <tr>
+        <td>${c.className || c.name}</td> <td>${c.startDate}</td>
+        <td>${c.endDate}</td>
+        <td>${price}đ</td>
+        <td>${c.discountPercentage}%</td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-edit" onclick="openClassModal('edit', ${courseId}, ${c.id})">Sửa</button>
+            <button class="btn-delete" onclick="deleteClass(${c.id})">Xóa</button>
+          </div>
+        </td>
+      </tr>
+    `;
+    })
+    .join('');
+}

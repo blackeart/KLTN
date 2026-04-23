@@ -10,9 +10,62 @@
     <div class='admin-container'>
       <div class='admin-header'>
         <h1>Quản lý khóa học</h1>
-        <button class='btn-add' onclick="openModal('add')">
-          + Thêm khóa học mới
-        </button>
+
+        <div
+          class='header-actions'
+          style='display: flex; align-items: stretch; gap: 10px;'
+        >
+          <a
+            href='/auth/admin'
+            class='btn-back-admin'
+            style='text-decoration: none; font-size: 0.9em; color: #0072bc; border: 1px solid #0072bc; padding: 8px 15px; border-radius: 5px;'
+          >
+            ← Quản lý bộ não AI
+          </a>
+
+          <button class='btn-add' onclick="openModal('add')">
+            + Thêm khóa học mới
+          </button>
+        </div>
+      </div>
+
+      <div class='filter-section shadow-sm p-3 mb-4 bg-white rounded'>
+        <div class='row g-3 align-items-end'>
+          <div class='col-md-4'>
+            <label class='form-label fw-bold small'>Tìm theo tên khóa học</label>
+            <input
+              type='text'
+              id='search-name'
+              class='form-control'
+              placeholder='Nhập tên khóa học...'
+              oninput='filterData()'
+            />
+          </div>
+          <div class='col-md-3'>
+            <label class='form-label fw-bold small'>Từ ngày (Khai giảng)</label>
+            <input
+              type='date'
+              id='search-start'
+              class='form-control'
+              onchange='filterData()'
+            />
+          </div>
+          <div class='col-md-3'>
+            <label class='form-label fw-bold small'>Đến ngày</label>
+            <input
+              type='date'
+              id='search-end'
+              class='form-control'
+              onchange='filterData()'
+            />
+          </div>
+          <div class='col-md-2'>
+            <button
+              class='btn btn-outline-secondary w-100'
+              onclick='resetFilter()'
+            >Xóa lọc</button>
+          </div>
+        </div>
       </div>
 
       <table class='admin-table'>
