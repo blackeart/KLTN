@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Get, Render, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Render,
+  UseGuards,
+  Param,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger'; // Thêm các decorator này
 import { AiService } from '../ai/ai.service';
 import { AuthViewGuard } from 'src/auth/roles.guard';
@@ -45,6 +55,19 @@ export class ChatController {
   async getKnowledge() {
     const data = await this.aiService.getAllKnowledge();
     return data; // NestJS tự hiểu đây là JSON
+  }
+
+  @Put('knowledge/:id')
+  async update(
+    @Param('id') id: number,
+    @Body() data: { title: string; content: string },
+  ) {
+    return this.aiService.updateKnowledge(id, data.title, data.content);
+  }
+
+  @Delete('knowledge/:id')
+  async remove(@Param('id') id: number) {
+    return this.aiService.deleteKnowledge(id);
   }
 
   @Get('test')

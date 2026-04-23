@@ -1,127 +1,161 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang='vi'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>Admin - Quản lý AI VTI</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'
+      rel='stylesheet'
+    />
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .card { border: none; border-radius: 15px; }
-        .btn-primary { background-color: #0072bc; border: none; border-radius: 10px; padding: 10px; }
-        .btn-primary:hover { background-color: #005a96; }
-        .table { border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        thead { background-color: #0072bc; color: white; }
-        .knowledge-content { max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .card {
+        border: none;
+        border-radius: 15px;
+      }
+      .btn-primary {
+        background-color: #0072bc;
+        border: none;
+        border-radius: 10px;
+        padding: 10px;
+      }
+      .btn-primary:hover {
+        background-color: #005a96;
+      }
+      .table {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      thead {
+        background-color: #0072bc;
+        color: white;
+      }
+      .sticky-form {
+        position: sticky;
+        top: 20px;
+      }
+      .action-btns button {
+        margin-right: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">🧠 Quản trị Bộ não AI - VTI Academy</h2>
-        <a href="/" class="btn btn-outline-secondary btn-sm">Quay lại trang chủ</a>
-    </div>
+    <div class='container mt-5'>
+      <div class='d-flex justify-content-between align-items-center mb-4'>
+        <h2 class='fw-bold text-primary'>🧠 Quản trị Bộ não AI - VTI Academy</h2>
+        <a href='/' class='btn btn-outline-secondary btn-sm'>Quay lại trang chủ</a>
+      </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card p-4 shadow-sm">
-                <h5 class="mb-3">Thêm kiến thức mới</h5>
-                <div class="mb-3">
-                    <label class="form-label small fw-bold">Tiêu đề</label>
-                    <input type="text" id="k-title" class="form-control" placeholder="VD: Khóa học Java Web" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-bold">Nội dung chi tiết</label>
-                    <textarea id="k-content" class="form-control" rows="6" placeholder="Nhập nội dung AI cần học..."></textarea>
-                </div>
-                <button onclick="saveKnowledge()" class="btn btn-primary w-100 shadow-sm">
-                    🚀 Lưu vào bộ nhớ AI
-                </button>
+      <div class='row'>
+        <div class='col-md-4'>
+          <div class='card p-4 shadow-sm sticky-form'>
+            <h5 id='form-title' class='mb-3'>Thêm kiến thức mới</h5>
+            <input type='hidden' id='k-id' />
+            <div class='mb-3'>
+              <label class='form-label small fw-bold'>Tiêu đề</label>
+              <input
+                type='text'
+                id='k-title'
+                class='form-control'
+                placeholder='VD: Khóa học Java Web'
+              />
             </div>
+            <div class='mb-3'>
+              <label class='form-label small fw-bold'>Nội dung chi tiết</label>
+              <textarea
+                id='k-content'
+                class='form-control'
+                rows='8'
+                placeholder='Nhập nội dung AI cần học...'
+              ></textarea>
+            </div>
+
+            <button
+              onclick='saveKnowledge()'
+              id='btn-submit'
+              class='btn btn-primary w-100 shadow-sm'
+            >
+              🚀 Lưu vào bộ nhớ AI
+            </button>
+            <button
+              onclick='resetForm()'
+              id='btn-cancel'
+              class='btn btn-link w-100 mt-2 text-decoration-none'
+              style='display: none;'
+            >
+              Hủy bỏ
+            </button>
+          </div>
         </div>
 
-        <div class="col-md-8">
-            <h5 class="mb-3">Danh sách kiến thức AI đã học</h5>
-            <div class="table-responsive">
-                <table class="table table-hover bg-white">
-                    <thead>
-                        <tr>
-                            <th style="width: 30%">Tiêu đề</th>
-                            <th style="width: 70%">Nội dung</th>
-                        </tr>
-                    </thead>
-                    <tbody id="knowledge-list">
-                        </tbody>
-                </table>
-            </div>
+        <div class='col-md-8'>
+          <h5 class='mb-3'>Danh sách kiến thức AI đã học</h5>
+          <div class='table-responsive'>
+            <table class='table table-hover bg-white'>
+              <thead>
+                <tr>
+                  <th style='width: 25%'>Tiêu đề</th>
+                  <th style='width: 55%'>Nội dung</th>
+                  <th style='width: 20%'>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id='knowledge-list'>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<script>
-    // Kiểm tra xem script có chạy vào đây không
-    console.log("Script Admin đã tải thành công!");
-
-    // Định nghĩa hàm lưu kiến thức
-    async function saveKnowledge() {
-        console.log("Nút bấm đã kích hoạt hàm saveKnowledge");
-        
-        const titleInput = document.getElementById('k-title');
-        const contentInput = document.getElementById('k-content');
-        
-        const title = titleInput.value.trim();
-        const content = contentInput.value.trim();
-        
-        if (!title || !content) {
-            alert('Lỗi: Bạn chưa nhập Tiêu đề hoặc Nội dung!');
-            return;
-        }
-
-        try {
-            const response = await fetch('/chat/knowledge', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, content })
-            });
-
-            if (response.ok) {
-                alert('Thành công: AI đã học được kiến thức mới!');
-                titleInput.value = '';
-                contentInput.value = '';
-                loadKnowledge(); // Cập nhật lại danh sách hiển thị
-            } else {
-                const error = await response.json();
-                alert('Lỗi từ Server: ' + (error.message || 'Không thể lưu'));
-            }
-        } catch (err) {
-            console.error('Lỗi kết nối:', err);
-            alert('Lỗi kết nối API. Hãy kiểm tra lại Terminal của NestJS!');
-        }
-    }
-
-    // Định nghĩa hàm tải danh sách
-    async function loadKnowledge() {
-        try {
-            const response = await fetch('/chat/knowledge/all');
-            const data = await response.json();
-            const list = document.getElementById('knowledge-list');
-            
-            if (data && data.length > 0) {
-                list.innerHTML = data.map(k => `
-                    <tr>
-                        <td class="fw-bold text-primary">${k.title}</td>
-                        <td class="small">${k.content.substring(0, 200)}${k.content.length > 200 ? '...' : ''}</td>
-                    </tr>
-                `).join('');
-            } else {
-                list.innerHTML = '<tr><td colspan="2" class="text-center text-muted">Chưa có kiến thức nào trong bộ nhớ.</td></tr>';
-            }
-        } catch (err) {
-            console.error('Không thể load danh sách:', err);
-        }
-    }
-
-    // Gọi hàm load ngay khi trang vừa tải xong
-    window.onload = loadKnowledge;
-</script>
+    <script>
+      let allKnowledge = []; // Lưu danh sách tạm để không bị lỗi cú pháp chuỗi
+      let isEditing = false; async function loadKnowledge() { try { const
+      response = await fetch('/chat/knowledge/all'); allKnowledge = await
+      response.json(); const list = document.getElementById('knowledge-list');
+      if (allKnowledge.length > 0) { list.innerHTML = allKnowledge.map(k => `
+      <tr> <td class="fw-bold text-primary">${k.title}</td> <td class="small
+      text-muted">${k.content.substring(0, 150)}...</td> <td
+      class="action-btns"> <button onclick="prepareEdit(${k.id})" class="btn
+      btn-sm btn-warning">Sửa</button> <button
+      onclick="deleteKnowledge(${k.id})" class="btn btn-sm
+      btn-danger">Xóa</button> </td> </tr> `).join(''); } else { list.innerHTML
+      = '<tr><td colspan="3" class="text-center text-muted">Trống.</td></tr>'; }
+      } catch (err) { console.error('Lỗi load danh sách:', err); } } function
+      prepareEdit(id) { const item = allKnowledge.find(k => k.id === id); if
+      (!item) return; isEditing = true;
+      document.getElementById('form-title').innerText = "Cập nhật kiến thức";
+      document.getElementById('btn-submit').innerText = "Cập nhật bộ nhớ";
+      document.getElementById('btn-cancel').style.display = "block";
+      document.getElementById('k-id').value = item.id;
+      document.getElementById('k-title').value = item.title;
+      document.getElementById('k-content').value = item.content;
+      window.scrollTo({ top: 0, behavior: 'smooth' }); } async function
+      saveKnowledge() { const id = document.getElementById('k-id').value; const
+      title = document.getElementById('k-title').value.trim(); const content =
+      document.getElementById('k-content').value.trim(); if (!title || !content)
+      { alert('Vui lòng nhập đủ thông tin!'); return; } const url = isEditing ?
+      `/chat/knowledge/${id}` : '/chat/knowledge'; const method = isEditing ?
+      'PUT' : 'POST'; try { const response = await fetch(url, { method: method,
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      title, content }) }); if (response.ok) { alert(isEditing ? 'Đã cập nhật!'
+      : 'Đã lưu thành công!'); resetForm(); loadKnowledge(); } } catch (err) {
+      alert('Lỗi kết nối server!'); } } async function deleteKnowledge(id) { if
+      (!confirm('Bạn có chắc muốn xóa kiến thức này?')) return; try { const
+      response = await fetch(`/chat/knowledge/${id}`, { method: 'DELETE' }); if
+      (response.ok) { loadKnowledge(); } } catch (err) { alert('Lỗi khi xóa!');
+      } } function resetForm() { isEditing = false;
+      document.getElementById('form-title').innerText = "Thêm kiến thức mới";
+      document.getElementById('btn-submit').innerText = "🚀 Lưu vào bộ nhớ AI";
+      document.getElementById('btn-cancel').style.display = "none";
+      document.getElementById('k-id').value = '';
+      document.getElementById('k-title').value = '';
+      document.getElementById('k-content').value = ''; } window.onload =
+      loadKnowledge;
+    </script>
+  </body>
+</html>

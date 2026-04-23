@@ -38,12 +38,12 @@ export class AiService {
     // this.model = this.genAI.getGenerativeModel({
     //   model: 'gemini-flash-latest',
     // });
-    // this.model = this.genAI.getGenerativeModel({
-    //   model: 'gemini-flash-lite-latest',
-    // });
     this.model = this.genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-flash-lite-latest',
     });
+    // this.model = this.genAI.getGenerativeModel({
+    //   model: 'gemini-2.5-flash',
+    // });
   }
 
   // --- Chức năng cho Admin ---
@@ -86,6 +86,26 @@ export class AiService {
     return await this.knowledgeRepo.find({
       order: { id: 'DESC' }, // Hiện cái mới nhất lên đầu
     });
+  }
+
+  async updateKnowledge(id: number, title: string, content: string) {
+    const knowledge = await this.knowledgeRepo.findOne({ where: { id } });
+    if (!knowledge) throw new Error('Không tìm thấy kiến thức này');
+
+    // Nếu nội dung thay đổi, phải cập nhật lại Embedding (Vector)
+    if (content !== knowledge.content) {
+      const newVector = await this.getEmbedding(content);
+      knowledge.embedding = newVector;
+    }
+
+    knowledge.title = title;
+    knowledge.content = content;
+
+    return await this.knowledgeRepo.save(knowledge);
+  }
+
+  async deleteKnowledge(id: number) {
+    return await this.knowledgeRepo.delete(id);
   }
 
   // --- Chức năng Chat có bộ nhớ và kiến thức ---
@@ -229,22 +249,58 @@ export class AiService {
         .join('\n');
 
       // 6. XÂY DỰNG SYSTEM PROMPT
+      const currentDate = new Date().toLocaleDateString('vi-VN');
+      //       const systemPrompt = `
+      // Bạn là một trợ lý tư vấn tuyển sinh thông minh và trung thực của VTI Academy.
+
+      // QUY TẮC NẰM LÒNG:
+      // 1. ĐỐI VỚI KHÓA HỌC VÀ LỊCH HỌC:
+      //    - CHỈ ĐƯỢC PHÉP sử dụng thông tin trong phần "THÔNG TIN KHÓA HỌC & LỚP HỌC".
+      //    - Nếu dữ liệu không có lớp học hoặc không có lịch khai giảng cho khóa học đó, hãy trả lời: "Hiện tại tôi chưa có lịch khai giảng cụ thể cho khóa học này, vui lòng để lại thông tin để tư vấn viên liên hệ sớm nhất".
+      //    - TUYỆT ĐỐI KHÔNG tự bịa ra ngày tháng, mã lớp hoặc học phí nếu không thấy trong ngữ cảnh.
+
+      // 2. ĐỐI VỚI KIẾN THỨC KỸ THUẬT/CHUYÊN MÔN:
+      //    - Nếu khách hàng hỏi các câu hỏi chung (ví dụ: "Java là gì?", "Lập trình viên cần học gì?", "So sánh React và Angular"), bạn hãy sử dụng kiến thức sẵn có của mình để giải thích một cách dễ hiểu, chuyên nghiệp.
+      //    - Sau khi giải thích xong, hãy khéo léo dẫn dắt họ về các khóa học liên quan có trong Database.
+
+      // 3. PHONG CÁCH TRẢ LỜI:
+      //    - Thân thiện, chuyên nghiệp, sử dụng đại từ "tôi" và "bạn" hoặc "anh/chị".
+      //    - Câu trả lời ngắn gọn, có cấu trúc (sử dụng gạch đầu dòng nếu cần).
+
+      // NGỮ CẢNH NỘI BỘ TỪ DATABASE:
+      // ${context}
+
+      // LỊCH SỬ CHAT GẦN ĐÂY:
+      // ${historyText}
+
+      // CÂU HỎI HIỆN TẠI: ${userQuestion}
+
+      // TRẢ LỜI:`;
       const systemPrompt = `
-Bạn là một trợ lý tư vấn tuyển sinh thông minh và trung thực của VTI Academy.
+Bạn là một trợ lý tư vấn tuyển sinh thông minh, trung thực và khéo léo của VTI Academy. 
+Hôm nay là ngày ${currentDate}.
 
-QUY TẮC NẰM LÒNG:
-1. ĐỐI VỚI KHÓA HỌC VÀ LỊCH HỌC: 
-   - CHỈ ĐƯỢC PHÉP sử dụng thông tin trong phần "THÔNG TIN KHÓA HỌC & LỚP HỌC".
-   - Nếu dữ liệu không có lớp học hoặc không có lịch khai giảng cho khóa học đó, hãy trả lời: "Hiện tại tôi chưa có lịch khai giảng cụ thể cho khóa học này, vui lòng để lại thông tin để tư vấn viên liên hệ sớm nhất". 
-   - TUYỆT ĐỐI KHÔNG tự bịa ra ngày tháng, mã lớp hoặc học phí nếu không thấy trong ngữ cảnh.
+QUY TẮC TƯ VẤN KHÓA HỌC & LỚP HỌC:
+1. PHÂN LOẠI TRẠNG THÁI:
+   - Lớp sắp khai giảng: Có ngày khai giảng SAU ngày ${currentDate}.
+   - Lớp đã bắt đầu: Có ngày khai giảng TRƯỚC hoặc BẰNG ngày ${currentDate}.
 
-2. ĐỐI VỚI KIẾN THỨC KỸ THUẬT/CHUYÊN MÔN:
-   - Nếu khách hàng hỏi các câu hỏi chung (ví dụ: "Java là gì?", "Lập trình viên cần học gì?", "So sánh React và Angular"), bạn hãy sử dụng kiến thức sẵn có của mình để giải thích một cách dễ hiểu, chuyên nghiệp.
-   - Sau khi giải thích xong, hãy khéo léo dẫn dắt họ về các khóa học liên quan có trong Database.
+2. CHIẾN THUẬT TƯ VẤN:
+   - ƯU TIÊN tối đa việc giới thiệu các "LỚP SẮP KHAI GIẢNG" để học viên đăng ký ngay.
+   - Nếu khách hàng hỏi về một lớp "ĐÃ BẮT ĐẦU", hãy phản hồi trung thực rằng: "Lớp này hiện đã bắt đầu học rồi". 
+   - Sau đó, hãy khéo léo gợi ý: "Tuy nhiên, nếu bạn quan tâm, tôi có thể giúp bạn đăng ký giữ chỗ cho suất khai giảng tiếp theo hoặc tư vấn lộ trình học phù hợp để bạn không bị lỡ kiến thức. Bạn có muốn tham khảo các lớp sắp khai giảng khác không?"
 
-3. PHONG CÁCH TRẢ LỜI:
-   - Thân thiện, chuyên nghiệp, sử dụng đại từ "tôi" và "bạn" hoặc "anh/chị".
-   - Câu trả lời ngắn gọn, có cấu trúc (sử dụng gạch đầu dòng nếu cần).
+3. GIỚI HẠN THÔNG TIN:
+   - CHỈ sử dụng dữ liệu trong phần "NGỮ CẢNH NỘI BỘ". Không tự bịa mã lớp, ngày tháng hay học phí.
+   - Nếu không tìm thấy lớp phù hợp, hãy mời khách hàng để lại thông tin liên lạc.
+
+QUY TẮC KIẾN THỨC CHUYÊN MÔN:
+- Giải thích các khái niệm kỹ thuật (Java, RAG, Frontend...) bằng kiến thức chuyên gia của bạn để tạo uy tín.
+- Luôn kết thúc câu trả lời bằng cách dẫn dắt về các khóa học tương ứng tại VTI Academy.
+
+PHONG CÁCH:
+- Thân thiện, chuyên nghiệp. Xưng hô "tôi" và "bạn" hoặc "anh/chị".
+- Trình bày sạch sẽ, dùng gạch đầu dòng cho các thông số lớp học.
 
 NGỮ CẢNH NỘI BỘ TỪ DATABASE:
 ${context}
@@ -255,7 +311,6 @@ ${historyText}
 CÂU HỎI HIỆN TẠI: ${userQuestion}
 
 TRẢ LỜI:`;
-
       // 7. GỌI GEMINI & LƯU LOG
       const result = await this.model.generateContent(systemPrompt);
       const aiResponse = result.response.text();
@@ -273,6 +328,39 @@ TRẢ LỜI:`;
     }
   }
 
+  // private async formatCourseToText(courseId: number): Promise<string> {
+  //   const course = await this.courseRepo.findOne({
+  //     where: { id: courseId },
+  //     relations: ['classes'],
+  //   });
+
+  //   if (!course) return '';
+
+  //   let text = `Khóa học: ${course.name}. \n`;
+  //   text += `Mô tả: ${course.description}. \n`;
+  //   text += `Dành cho: ${course.targetAudience.join(', ')}. \n`;
+  //   text += `Lợi ích: ${course.benefits.join(', ')}. \n`;
+
+  //   // Gom thông tin lộ trình (Curriculum)
+  //   text +=
+  //     `Lộ trình học: ` +
+  //     course.curriculum.map((m) => m.moduleName).join(', ') +
+  //     '. \n';
+
+  //   // Quan trọng: Gom thông tin các lớp học đang mở
+  //   if (course.classes && course.classes.length > 0) {
+  //     text += `Thông tin các lớp học hiện có: \n`;
+  //     course.classes.forEach((cls) => {
+  //       const finalPrice =
+  //         Number(cls.basePrice) * (1 - cls.discountPercentage / 100);
+  //       // text += `- Lớp ${cls.className}: Khai giảng ${cls.startDate}. Học phí gốc ${cls.basePrice}đ, ưu đãi còn ${finalPrice}đ. \n`;
+  //       text += `- Lớp ${cls.className}: Lịch học ${cls.schedule || 'liên hệ'}, Khai giảng ${new Date(cls.startDate).toLocaleDateString('vi-VN')}. Học phí gốc ${cls.basePrice}đ, ưu đãi còn ${finalPrice}đ. \n`;
+  //     });
+  //   }
+
+  //   return text;
+  // }
+
   private async formatCourseToText(courseId: number): Promise<string> {
     const course = await this.courseRepo.findOne({
       where: { id: courseId },
@@ -283,24 +371,33 @@ TRẢ LỜI:`;
 
     let text = `Khóa học: ${course.name}. \n`;
     text += `Mô tả: ${course.description}. \n`;
-    text += `Dành cho: ${course.targetAudience.join(', ')}. \n`;
-    text += `Lợi ích: ${course.benefits.join(', ')}. \n`;
 
-    // Gom thông tin lộ trình (Curriculum)
-    text +=
-      `Lộ trình học: ` +
-      course.curriculum.map((m) => m.moduleName).join(', ') +
-      '. \n';
+    const now = new Date(); // Lấy thời gian hiện tại
 
-    // Quan trọng: Gom thông tin các lớp học đang mở
     if (course.classes && course.classes.length > 0) {
-      text += `Thông tin các lớp học hiện có: \n`;
+      const upcomingClasses = [];
+      const startedClasses = [];
+
       course.classes.forEach((cls) => {
+        const startDate = new Date(cls.startDate);
         const finalPrice =
           Number(cls.basePrice) * (1 - cls.discountPercentage / 100);
-        // text += `- Lớp ${cls.className}: Khai giảng ${cls.startDate}. Học phí gốc ${cls.basePrice}đ, ưu đãi còn ${finalPrice}đ. \n`;
-        text += `- Lớp ${cls.className}: Lịch học ${cls.schedule || 'liên hệ'}, Khai giảng ${new Date(cls.startDate).toLocaleDateString('vi-VN')}. Học phí gốc ${cls.basePrice}đ, ưu đãi còn ${finalPrice}đ. \n`;
+        const classInfo = `- Lớp ${cls.className}: Lịch học ${cls.schedule || 'liên hệ'}, Khai giảng ${startDate.toLocaleDateString('vi-VN')}. Học phí ưu đãi còn ${finalPrice}đ.`;
+
+        if (startDate > now) {
+          upcomingClasses.push(classInfo);
+        } else {
+          startedClasses.push(classInfo);
+        }
       });
+
+      if (upcomingClasses.length > 0) {
+        text += `--- CÁC LỚP SẮP KHAI GIẢNG (NÊN TƯ VẤN): \n${upcomingClasses.join('\n')}\n`;
+      }
+
+      if (startedClasses.length > 0) {
+        text += `--- CÁC LỚP ĐÃ BẮT ĐẦU (CHỈ NHẮC NẾU CẦN): \n${startedClasses.join('\n')}\n`;
+      }
     }
 
     return text;
