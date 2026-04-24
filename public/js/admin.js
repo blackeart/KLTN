@@ -225,12 +225,22 @@ function filterCourses() {
 }
 
 // 1. Toggle danh sách lớp
-function toggleClasses(courseId) {
+async function toggleClasses(courseId) {
   const container = document.getElementById(`class-container-${courseId}`);
-  if (container.style.display === 'none') {
+  if (!container) return;
+
+  // Kiểm tra trạng thái hiển thị thực tế (Computed Style)
+  const isHidden = window.getComputedStyle(container).display === 'none';
+
+  if (isHidden) {
+    // Hiện hàng chứa lớp học
     container.style.display = 'table-row';
-    renderClasses(courseId);
+
+    // BẮT BUỘC gọi hàm render để lấy data lọc từ server
+    // Nếu trước đó bạn xóa dòng này, hãy thêm lại
+    await renderClasses(courseId);
   } else {
+    // Đóng lại
     container.style.display = 'none';
   }
 }
@@ -252,30 +262,36 @@ function toggleClasses(courseId) {
 // }
 
 // 2. Fetch và Render danh sách lớp
+// admin.js
 async function renderClasses(courseId) {
-  const response = await fetch(`/courses/${courseId}`); // API lấy chi tiết khóa học kèm classes
-  const course = await response.json();
-  const tbody = document.getElementById(`class-list-${courseId}`);
+  // Lấy chính xác theo ID trong HTML bạn vừa gửi
+  const startInput = document.getElementById('search-start');
+  const endInput = document.getElementById('search-end');
 
-  tbody.innerHTML =
-    course.classes
-      .map(
-        (cls) => `
-        <tr>
-            <td>${cls.className}</td>
-            <td>${cls.startDate}</td>
-            <td>${cls.endDate}</td>
-            <td>${Number(cls.basePrice).toLocaleString()}đ</td>
-            <td>${cls.discountPercentage}%</td>
-            <td>
-                <button class="btn-edit" onclick="openClassModal('edit', ${courseId}, ${JSON.stringify(cls).replace(/"/g, '&quot;')})">Sửa</button>
-                <button class="btn-delete" onclick="deleteClass(${cls.id})">Xóa</button>
-            </td>
-        </tr>
-    `,
-      )
-      .join('') ||
-    '<tr><td colspan="6" style="text-align:center">Chưa có lớp nào</td></tr>';
+  // Lấy giá trị .value
+  const startDate = startInput ? startInput.value : '';
+  const endDate = endInput ? endInput.value : '';
+
+  // Log ra console để bạn kiểm tra xem đã lấy được chưa
+  console.log('Giá trị gửi đi:', { startDate, endDate });
+
+  // Gọi API với tham số chuẩn
+  const url = `/courses/${courseId}?startDate=${startDate}&endDate=${endDate}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network response was not ok');
+
+    const course = await response.json();
+
+    const classListBody = document.getElementById(`class-list-${courseId}`);
+    if (classListBody) {
+      // Vẽ lại danh sách lớp học
+      classListBody.innerHTML = renderClassesRows(course.classes, courseId);
+    }
+  } catch (error) {
+    console.error('Lỗi khi load danh sách lớp:', error);
+  }
 }
 
 // 3. Xử lý Modal Lớp học

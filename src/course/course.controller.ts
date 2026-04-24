@@ -92,8 +92,12 @@ export class CourseController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Xem chi tiết khóa học và các lớp học' })
-  findOne(@Param('id') id: number) {
-    return this.courseService.getCourseDetails(id);
+  findOne(
+    @Param('id') id: number,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.courseService.getCourseDetails(id, startDate, endDate);
   }
 
   @Put(':id')
