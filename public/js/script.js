@@ -1,183 +1,164 @@
 /* public/js/script.js */
+
+// =============================================
+// SLIDER - Chỉ chạy nếu trang có slider
+// =============================================
 const slides = document.querySelectorAll('.slide');
 const nextBtn = document.querySelector('.next-btn');
 const prevBtn = document.querySelector('.prev-btn');
-let currentSlide = 0;
-let slideInterval;
 
-// Hàm hiển thị Slide dựa trên Index
-function showSlide(index) {
-  // Nếu vượt quá số lượng, quay về 0
-  if (index >= slides.length) currentSlide = 0;
-  // Nếu nhỏ hơn 0, quay về cuối
-  if (index < 0) currentSlide = slides.length - 1;
+if (slides.length > 0 && nextBtn && prevBtn) {
+  let currentSlide = 0;
+  let slideInterval;
 
-  // Gỡ bỏ class 'active' khỏi tất cả các slide
-  slides.forEach((slide) => slide.classList.remove('active'));
-  // Thêm class 'active' vào slide hiện tại
-  slides[currentSlide].classList.add('active');
-}
+  function showSlide(index) {
+    if (index >= slides.length) currentSlide = 0;
+    if (index < 0) currentSlide = slides.length - 1;
+    slides.forEach((slide) => slide.classList.remove('active'));
+    slides[currentSlide].classList.add('active');
+  }
 
-// Hàm chuyển đến slide tiếp theo
-function nextSlide() {
-  currentSlide++;
-  showSlide(currentSlide);
-}
+  function nextSlide() {
+    currentSlide++;
+    showSlide(currentSlide);
+  }
 
-// Hàm quay về slide trước
-function prevSlide() {
-  currentSlide--;
-  showSlide(currentSlide);
-}
+  function prevSlide() {
+    currentSlide--;
+    showSlide(currentSlide);
+  }
 
-// Bắt sự kiện Click cho các nút
-nextBtn.addEventListener('click', () => {
-  nextSlide();
-  resetInterval(); // Bấm nút thì dừng tự động 1 lát
-});
-prevBtn.addEventListener('click', () => {
-  prevSlide();
-  resetInterval();
-});
+  function startInterval() {
+    slideInterval = setInterval(nextSlide, 5000);
+  }
 
-// Hàm tự động chạy Slider (mỗi 5 giây)
-function startInterval() {
-  slideInterval = setInterval(nextSlide, 5000);
-}
+  function resetInterval() {
+    clearInterval(slideInterval);
+    startInterval();
+  }
 
-// Hàm reset thời gian tự động khi người dùng thao tác thủ công
-function resetInterval() {
-  clearInterval(slideInterval);
+  nextBtn.addEventListener('click', () => {
+    nextSlide();
+    resetInterval();
+  });
+  prevBtn.addEventListener('click', () => {
+    prevSlide();
+    resetInterval();
+  });
+
   startInterval();
 }
 
-// Bắt đầu chạy
-startInterval();
-
+// =============================================
+// CHAT - Chỉ chạy nếu trang có chat widget
+// =============================================
 const chatWindow = document.getElementById('chat-window');
-const chatBtn = document.getElementById('chat-btn'); // Nút xanh tròn
+const chatBtn = document.getElementById('chat-btn');
 const closeChat = document.getElementById('close-chat');
 const chatBody = document.getElementById('chat-body');
 const chatInput = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Đóng/Mở khung chat
-chatBtn.onclick = () => {
-  chatWindow.style.display =
-    chatWindow.style.display === 'flex' ? 'none' : 'flex';
-};
-closeChat.onclick = () => (chatWindow.style.display = 'none');
+if (chatBtn && chatWindow) {
+  // Đóng/Mở khung chat
+  chatBtn.onclick = () => {
+    chatWindow.style.display =
+      chatWindow.style.display === 'flex' ? 'none' : 'flex';
+  };
+  closeChat.onclick = () => (chatWindow.style.display = 'none');
 
-// Hàm thêm tin nhắn vào màn hình
-function appendMessage(role, text) {
-  const msgDiv = document.createElement('div');
-  msgDiv.className = `message ${role}`;
-  msgDiv.innerText = text;
-  chatBody.appendChild(msgDiv);
-  chatBody.scrollTop = chatBody.scrollHeight; // Cuộn xuống dưới cùng
-}
-
-// Hàm gửi tin nhắn lên Server
-// async function sendMessage() {
-//   const text = chatInput.value.trim();
-//   if (!text) return;
-
-//   appendMessage('user', text); // Hiển thị tin nhắn người dùng
-//   chatInput.value = '';
-
-//   // Hiển thị trạng thái "đang trả lời..."
-//   const loadingDiv = document.createElement('div');
-//   loadingDiv.className = 'message bot';
-//   loadingDiv.innerText = 'AI đang suy nghĩ...';
-//   chatBody.appendChild(loadingDiv);
-
-//   try {
-//     const response = await fetch('/chat/ask', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({ message: text }),
-//     });
-
-//     const result = await response.json();
-//     chatBody.removeChild(loadingDiv); // Xóa dòng đang chờ
-
-//     if (result.success) {
-//       appendMessage('bot', result.data);
-//     } else {
-//       appendMessage('bot', 'Có lỗi xảy ra, bạn thử lại nhé!');
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     chatBody.removeChild(loadingDiv);
-//     appendMessage('bot', 'Không kết nối được với Server.');
-//   }
-// }
-async function sendMessage() {
-  const text = chatInput.value.trim();
-  if (!text) return;
-
-  appendMessage('user', text);
-  chatInput.value = '';
-
-  // --- PHẦN THAY ĐỔI: Tạo hiệu ứng đang nhập ---
-  const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'message bot typing-indicator'; // Thêm class typing-indicator
-  loadingDiv.innerHTML = '<span></span><span></span><span></span>'; // 3 dấu chấm
-  chatBody.appendChild(loadingDiv);
-  chatBody.scrollTop = chatBody.scrollHeight; // Cuộn xuống dưới cùng
-
-  try {
-    const response = await fetch('/chat/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text }),
-    });
-
-    const result = await response.json();
-    chatBody.removeChild(loadingDiv); // Xóa hiệu ứng sau khi có kết quả
-
-    if (result.success) {
-      appendMessage('bot', result.data);
-    } else {
-      appendMessage('bot', 'Có lỗi xảy ra, bạn thử lại nhé!');
-    }
-  } catch (error) {
-    console.error(error);
-    if (loadingDiv.parentNode) chatBody.removeChild(loadingDiv);
-    appendMessage('bot', 'Không kết nối được với Server.');
+  // Hàm thêm tin nhắn vào màn hình
+  function appendMessage(role, text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${role}`;
+    msgDiv.innerText = text;
+    chatBody.appendChild(msgDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
   }
-}
 
-// Bắt sự kiện nhấn nút gửi hoặc Enter
-sendBtn.onclick = sendMessage;
-chatInput.onkeypress = (e) => {
-  if (e.key === 'Enter') sendMessage();
-};
+  // Hàm hiệu ứng chạy chữ
+  function typeWriter(text, element) {
+    let i = 0;
+    element.innerText = '';
+    function typing() {
+      if (i < text.length) {
+        element.innerText += text.charAt(i);
+        i++;
+        chatBody.scrollTop = chatBody.scrollHeight;
+        setTimeout(typing, 20);
+      }
+    }
+    typing();
+  }
 
-function typeWriter(text, element) {
-  let i = 0;
-  element.innerText = ''; // Xóa chữ cũ
-  function typing() {
-    if (i < text.length) {
-      element.innerText += text.charAt(i);
-      i++;
-      chatBody.scrollTop = chatBody.scrollHeight;
-      setTimeout(typing, 20); // Tốc độ chạy chữ 20ms
+  function renderMarkdown(text) {
+    return text
+      .replace(/###\s?(.+)/g, '<b>$1</b>') // ### Tiêu đề
+      .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>') // **bold**
+      .replace(/\*(.+?)\*/g, '<i>$1</i>') // *italic*
+      .replace(/\n/g, '<br>'); // xuống dòng
+  }
+
+  // Hàm gửi tin nhắn lên Server
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    appendMessage('user', text);
+    chatInput.value = '';
+
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'message bot typing-indicator';
+    loadingDiv.innerHTML = '<span></span><span></span><span></span>';
+    chatBody.appendChild(loadingDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    try {
+      const response = await fetch('/chat/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+      });
+
+      const result = await response.json();
+      chatBody.removeChild(loadingDiv);
+
+      if (result.success) {
+        const botMsgDiv = document.createElement('div');
+        botMsgDiv.className = 'message bot';
+        botMsgDiv.innerHTML = renderMarkdown(result.data); // ← dùng innerHTML + renderMarkdown
+        chatBody.appendChild(botMsgDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      } else {
+        appendMessage('bot', 'Có lỗi xảy ra, bạn thử lại nhé!');
+      }
+    } catch (error) {
+      console.error(error);
+      if (loadingDiv.parentNode) chatBody.removeChild(loadingDiv);
+      appendMessage('bot', 'Không kết nối được với Server.');
     }
   }
-  typing();
+
+  // Bắt sự kiện nhấn nút gửi hoặc Enter
+  sendBtn.onclick = sendMessage;
+  chatInput.onkeypress = (e) => {
+    if (e.key === 'Enter') sendMessage();
+  };
 }
 
+// =============================================
+// COUNTDOWN - Chỉ chạy nếu trang có countdown
+// =============================================
 function startCountdown() {
-  // Thiết lập thời gian kết thúc: 8 giờ kể từ hiện tại
-  const durationInMilliseconds = 8 * 60 * 60 * 1000 + 7 * 60 * 1000 + 20 * 1000; // 08:07:20
-  const endTime = new Date().getTime() + durationInMilliseconds;
+  const daysEl = document.getElementById('days');
+  if (!daysEl) return; // Không có countdown thì thoát
+
+  const durationInMs = 8 * 60 * 60 * 1000 + 7 * 60 * 1000 + 20 * 1000; // 08:07:20
+  const endTime = new Date().getTime() + durationInMs;
 
   const timer = setInterval(() => {
-    const now = new Date().getTime();
-    const distance = endTime - now;
+    const distance = endTime - new Date().getTime();
 
-    // Tính toán Ngày, Giờ, Phút, Giây
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor(
       (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
@@ -185,7 +166,6 @@ function startCountdown() {
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    // Hiển thị ra giao diện (padSart để luôn có 2 chữ số)
     document.getElementById('days').innerText = days
       .toString()
       .padStart(2, '0');
@@ -199,38 +179,22 @@ function startCountdown() {
       .toString()
       .padStart(2, '0');
 
-    // Xử lý khi đếm ngược kết thúc
     if (distance < 0) {
       clearInterval(timer);
-      document.getElementById('days').innerText = '00';
-      document.getElementById('hours').innerText = '00';
-      document.getElementById('minutes').innerText = '00';
-      document.getElementById('seconds').innerText = '00';
-
-      // Bạn có thể thêm hành động tùy ý ở đây
+      ['days', 'hours', 'minutes', 'seconds'].forEach((id) => {
+        document.getElementById(id).innerText = '00';
+      });
       console.log('Ưu đãi đã hết hạn!');
-      // Ví dụ: Ẩn phần countdown hoặc đổi chữ thành "Đã hết ưu đãi"
     }
   }, 1000);
 }
 
-// Gọi hàm khi trang web tải xong
-document.addEventListener('DOMContentLoaded', startCountdown);
-
-// Khi nhận được kết quả từ API
-if (result.success) {
-  const botMsgDiv = document.createElement('div');
-  botMsgDiv.className = 'message bot';
-  chatBody.appendChild(botMsgDiv);
-  typeWriter(result.data, botMsgDiv); // Gọi hiệu ứng chạy chữ
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  fetchClasses();
-});
-
+// =============================================
+// FETCH CLASSES - Chỉ chạy nếu có bảng lớp học
+// =============================================
 async function fetchClasses() {
   const tableBody = document.getElementById('class-table-body');
+  if (!tableBody) return; // Không có bảng thì thoát
 
   try {
     const response = await fetch('/courses/class/all');
@@ -242,12 +206,11 @@ async function fetchClasses() {
       return;
     }
 
-    tableBody.innerHTML = ''; // Xóa dòng "Đang tải"
+    tableBody.innerHTML = '';
 
     classes.forEach((cls) => {
       const row = document.createElement('tr');
 
-      // Tính toán giá sau ưu đãi (nếu cần show học phí)
       const finalPrice = cls.basePrice
         ? new Intl.NumberFormat('vi-VN').format(
             cls.basePrice * (1 - cls.discountPercentage / 100),
@@ -271,3 +234,17 @@ async function fetchClasses() {
       '<tr><td colspan="7" style="text-align: center; color: red;">Lỗi tải dữ liệu.</td></tr>';
   }
 }
+
+function scrollToRegister() {
+  document.getElementById('reg-section').scrollIntoView({
+    behavior: 'smooth',
+  });
+}
+
+// =============================================
+// KHỞI CHẠY KHI DOM SẴN SÀNG
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+  startCountdown();
+  fetchClasses();
+});

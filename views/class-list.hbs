@@ -77,7 +77,10 @@
                   <td>{{this.format}}</td>
                   <td>{{this.location}}</td>
                   <td>{{this.displayPrice}}</td>
-                  <td><button class='btn-register-small'>Đăng ký</button></td>
+                  <td><button
+                      class='btn-register-small'
+                      onclick='scrollToRegister()'
+                    >Đăng ký</button></td>
                 </tr>
               {{else}}
                 <tr>
@@ -92,7 +95,51 @@
       </div>
     </section>
 
-    <div class='reg-section'>
+    <div class='floating-widgets'>
+      <a
+        href='#contact-section'
+        class='widget-item consult-btn'
+        onclick='scrollToRegister()'
+      >
+        <span>NHẬN<br />TƯ VẤN</span>
+      </a>
+
+      <div class='widget-item chat-toggle-btn' id='chat-btn'>
+        <div class='chat-icon'>
+          <svg viewBox='0 0 24 24' width='30' height='30' fill='currentColor'>
+            <path
+              d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z'
+            />
+            <circle cx='7' cy='9' r='1.25' /><circle
+              cx='12'
+              cy='9'
+              r='1.25'
+            /><circle cx='17' cy='9' r='1.25' />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class='chat-window' id='chat-window'>
+      <div class='chat-header'>
+        <span>AI Admission Assistant</span>
+        <button id='close-chat'>×</button>
+      </div>
+      <div class='chat-body' id='chat-body'>
+        <div class='message bot'>Chào bạn! Tôi có thể giúp gì cho bạn về thông
+          tin tuyển sinh của VTI Academy?</div>
+      </div>
+      <div class='chat-footer'>
+        <input
+          type='text'
+          id='chat-input'
+          placeholder='Nhập câu hỏi tại đây...'
+        />
+        <button id='send-btn'>➤</button>
+      </div>
+    </div>
+
+    <div class='reg-section' id='reg-section'>
       <div class='reg-container'>
         <div class='reg-left'>
           <div class='promo-badge'>Cơ hội nhận ưu đãi học phí lên tới 40%</div>
@@ -138,7 +185,7 @@
       </div>
     </div>
 
-    <div class='chat-window' id='chat-window'>
+    {{! <div class='chat-window' id='chat-window'>
       <div class='chat-header'>
         <span>AI Admission Assistant</span>
         <button id='close-chat'>×</button>
@@ -155,7 +202,7 @@
         />
         <button id='send-btn'>➤</button>
       </div>
-    </div>
+    </div> }}
 
     <footer class='main-footer'>
       <div class='footer-container'>

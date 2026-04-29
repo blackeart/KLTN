@@ -35,12 +35,12 @@ export class AiService {
     // this.model = this.genAI.getGenerativeModel({
     //   model: 'gemini-2.5-pro',
     // });
-    // this.model = this.genAI.getGenerativeModel({
-    //   model: 'gemini-flash-latest',
-    // });
     this.model = this.genAI.getGenerativeModel({
-      model: 'gemini-flash-lite-latest',
+      model: 'gemini-flash-latest',
     });
+    // this.model = this.genAI.getGenerativeModel({
+    //   model: 'gemini-flash-lite-latest',
+    // });
     // this.model = this.genAI.getGenerativeModel({
     //   model: 'gemini-2.5-flash',
     // });
