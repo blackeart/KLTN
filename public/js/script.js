@@ -241,6 +241,27 @@ function scrollToRegister() {
   });
 }
 
+async function logout() {
+  if (!confirm('Bạn có chắc chắn muốn đăng xuất không?')) return;
+
+  try {
+    // Gọi API logout lên Server NestJS
+    const response = await fetch('/auth/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Dù kết quả API thế nào, ta cũng xóa trạng thái ở Client và chuyển trang
+    window.location.href = '/auth/login';
+  } catch (err) {
+    console.error('Lỗi khi đăng xuất:', err);
+    // Nếu lỗi mạng vẫn ép chuyển về trang login
+    window.location.href = '/auth/login';
+  }
+}
+
 // =============================================
 // KHỞI CHẠY KHI DOM SẴN SÀNG
 // =============================================

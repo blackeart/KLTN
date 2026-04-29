@@ -58,4 +58,15 @@ export class AuthController {
   getAdmin() {
     return { user: 'Admin VTI' };
   }
+
+  @Post('logout')
+  async logout(@Res() res: Response) {
+    // Nếu dùng Cookie JWT: Xóa cookie bằng cách set lại với thời gian hết hạn là đã qua
+    res.clearCookie('access_token');
+
+    // Nếu dùng Session: hủy session
+    // req.session.destroy();
+
+    return res.status(200).json({ message: 'Logout successful' });
+  }
 }
