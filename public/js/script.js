@@ -104,6 +104,8 @@ if (chatBtn && chatWindow) {
     const text = chatInput.value.trim();
     if (!text) return;
 
+    const sessionId = getSessionId();
+
     appendMessage('user', text);
     chatInput.value = '';
 
@@ -117,7 +119,7 @@ if (chatBtn && chatWindow) {
       const response = await fetch('/chat/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, sessionId }),
       });
 
       const result = await response.json();
@@ -260,6 +262,16 @@ async function logout() {
     // Nếu lỗi mạng vẫn ép chuyển về trang login
     window.location.href = '/auth/login';
   }
+}
+
+// Lấy hoặc tạo sessionId cho browser này
+function getSessionId() {
+  let sid = localStorage.getItem('chat_session_id');
+  if (!sid) {
+    sid = 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    localStorage.setItem('chat_session_id', sid);
+  }
+  return sid;
 }
 
 // =============================================

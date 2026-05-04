@@ -28,12 +28,15 @@ export class ChatController {
       },
     },
   })
-  async ask(@Body('message') message: string) {
-    const reply = await this.aiService.handleChat(message);
-    return {
-      success: true,
-      data: reply,
-    };
+  async ask(
+    @Body('message') message: string,
+    @Body('sessionId') sessionId: string,
+  ) {
+    const reply = await this.aiService.handleChat(
+      message,
+      sessionId || 'guest-session', // fallback nếu client cũ không gửi
+    );
+    return { success: true, data: reply };
   }
 
   @UseGuards(AuthViewGuard)
