@@ -117,10 +117,11 @@ document.getElementById('courseForm').onsubmit = async (e) => {
       location.reload();
     } else {
       const err = await response.json();
-      alert('Lỗi: ' + (err.message || 'Không thể lưu'));
+      const title = response.status === 409 ? 'Trùng tên khóa học' : 'Lỗi';
+      showErrorModal(title, err.message || 'Không thể lưu');
     }
   } catch (error) {
-    console.error('Error:', error);
+    showErrorModal('Lỗi kết nối', 'Không thể kết nối đến server');
   }
 };
 
@@ -317,20 +318,17 @@ function openClassModal(mode, courseId, classData = null) {
   document.getElementById('classModal').style.display = 'block';
   const form = document.getElementById('classForm');
 
-  // 1. Reset form về trạng thái trống
   form.reset();
   document.getElementById('currentClassId').value = '';
-
-  // 2. Quan trọng: Reset toàn bộ checkbox lịch học về trạng thái chưa tích
   document
     .querySelectorAll('input[name="scheduleDay"]')
     .forEach((cb) => (cb.checked = false));
 
   if (mode === 'edit' && classData) {
+    // classData giờ đã là object rồi, không cần fetch nữa
     document.getElementById('currentClassId').value = classData.id;
     document.getElementById('className').value = classData.className;
 
-    // Format lại ngày tháng (nếu dữ liệu từ DB là định dạng ISO YYYY-MM-DD...)
     if (classData.startDate)
       document.getElementById('startDate').value =
         classData.startDate.split('T')[0];
@@ -342,19 +340,14 @@ function openClassModal(mode, courseId, classData = null) {
     document.getElementById('discountPercentage').value =
       classData.discountPercentage;
 
-    // --- BỔ SUNG: Tích lại các checkbox dựa trên chuỗi schedule (VD: "2-4-6") ---
     if (classData.schedule) {
-      const days = classData.schedule.split('-'); // Tách "2-4-6" thành ["2", "4", "6"]
-      days.forEach((day) => {
-        const checkbox = document.querySelector(
+      classData.schedule.split('-').forEach((day) => {
+        const cb = document.querySelector(
           `input[name="scheduleDay"][value="${day}"]`,
         );
-        if (checkbox) {
-          checkbox.checked = true;
-        }
+        if (cb) cb.checked = true;
       });
     }
-    // --------------------------------------------------------------------------
   }
 }
 
@@ -460,11 +453,11 @@ document.getElementById('classForm').onsubmit = async (e) => {
       location.reload();
     } else {
       const err = await response.json();
-      alert('Lỗi: ' + (err.message || 'Không thể lưu lớp học'));
+      const title = response.status === 409 ? 'Trùng tên lớp học' : 'Lỗi';
+      showErrorModal(title, err.message || 'Không thể lưu lớp học');
     }
   } catch (error) {
-    console.error('Lỗi kết nối:', error);
-    alert('Lỗi kết nối server!');
+    showErrorModal('Lỗi kết nối', 'Không thể kết nối đến server');
   }
 };
 
@@ -591,7 +584,7 @@ function renderClassesRows(classes, courseId) {
         <td>${c.discountPercentage}%</td>
         <td>
           <div class="action-btns">
-            <button class="btn-edit" onclick="openClassModal('edit', ${courseId}, ${c.id})">Sửa</button>
+            <button class="btn-edit" onclick='openClassModal("edit", ${courseId}, ${JSON.stringify(c).replace(/'/g, '&#39;')})'>Sửa</button>
             <button class="btn-delete" onclick="deleteClass(${c.id})">Xóa</button>
           </div>
         </td>
@@ -600,3 +593,19 @@ function renderClassesRows(classes, courseId) {
     })
     .join('');
 }
+
+function showErrorModal(title, message) {
+  document.getElementById('errorModalTitle').innerText = title;
+  document.getElementById('errorModalMsg').innerText = message;
+  const modal = document.getElementById('errorModal');
+  modal.style.display = 'flex';
+}
+
+function closeErrorModal() {
+  document.getElementById('errorModal').style.display = 'none';
+}
+
+// Đóng khi click ra ngoài
+document.getElementById('errorModal').addEventListener('click', function (e) {
+  if (e.target === this) closeErrorModal();
+});

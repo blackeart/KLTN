@@ -35,12 +35,12 @@ export class AiService {
     // this.model = this.genAI.getGenerativeModel({
     //   model: 'gemini-2.5-pro',
     // });
-    this.model = this.genAI.getGenerativeModel({
-      model: 'gemini-flash-latest',
-    });
     // this.model = this.genAI.getGenerativeModel({
-    //   model: 'gemini-flash-lite-latest',
+    //   model: 'gemini-flash-latest',
     // });
+    this.model = this.genAI.getGenerativeModel({
+      model: 'gemini-flash-lite-latest',
+    });
     // this.model = this.genAI.getGenerativeModel({
     //   model: 'gemini-2.5-flash',
     // });
@@ -295,12 +295,18 @@ QUY TẮC TƯ VẤN KHÓA HỌC & LỚP HỌC:
    - Nếu không tìm thấy lớp phù hợp, hãy mời khách hàng để lại thông tin liên lạc.
 
 QUY TẮC KIẾN THỨC CHUYÊN MÔN:
-- Giải thích các khái niệm kỹ thuật (Java, RAG, Frontend...) bằng kiến thức chuyên gia của bạn để tạo uy tín.
-- Luôn kết thúc câu trả lời bằng cách dẫn dắt về các khóa học tương ứng tại VTI Academy.
+- Nếu câu hỏi là kiến thức kỹ thuật thuần túy (Java là gì, React vs Angular, tương lai ngành IT...), 
+  hãy trả lời bằng kiến thức chuyên gia của bạn một cách tự tin, không cần dựa vào NGỮ CẢNH NỘI BỘ.
+- Sau khi trả lời xong, khéo léo dẫn dắt về khóa học liên quan tại VTI Academy nếu có.
+- Nếu câu hỏi KHÔNG liên quan đến lập trình, công nghệ, phần mềm hoặc học tập 
+  (ví dụ: nấu ăn, thể thao, chính trị, giải trí...), hãy từ chối lịch sự:
+  "Xin lỗi bạn, tôi chỉ có thể hỗ trợ các câu hỏi liên quan đến công nghệ và tuyển sinh tại VTI Academy thôi ạ. Bạn có câu hỏi nào về lĩnh vực này không?"
 
-PHONG CÁCH:
+PHONG CÁCH & ĐỘ DÀI:
 - Thân thiện, chuyên nghiệp. Xưng hô "tôi" và "bạn" hoặc "anh/chị".
 - Trình bày sạch sẽ, dùng gạch đầu dòng cho các thông số lớp học.
+- TRẢ LỜI ĐÚNG TRỌNG TÂM: Chỉ trả lời những gì người dùng hỏi, không chủ động liệt kê thêm thông tin ngoài phạm vi câu hỏi.
+- SAU KHI TRẢ LỜI XONG, thêm 1 câu gợi ý ngắn gọn để người dùng biết họ có thể hỏi thêm gì liên quan. Ví dụ: "Bạn có muốn xem lịch các lớp đang mở của khóa này không?" hoặc "Bạn có muốn tìm hiểu thêm về học phí không?". Chỉ 1 câu gợi ý duy nhất, không nhiều hơn.
 
 NGỮ CẢNH NỘI BỘ TỪ DATABASE:
 ${context}
@@ -371,6 +377,19 @@ TRẢ LỜI:`;
 
     let text = `Khóa học: ${course.name}. \n`;
     text += `Mô tả: ${course.description}. \n`;
+
+    if (course.curriculum?.length > 0) {
+      text += `\nLỘ TRÌNH HỌC:\n`;
+      course.curriculum.forEach((module, mIdx) => {
+        text += `  Module ${mIdx + 1}: ${module.moduleName}\n`;
+        module.days?.forEach((day, dIdx) => {
+          text += `    Ngày ${dIdx + 1} - ${day.dayTitle}:\n`;
+          day.lessons?.forEach((lesson) => {
+            text += `      - ${lesson}\n`;
+          });
+        });
+      });
+    }
 
     const now = new Date(); // Lấy thời gian hiện tại
 

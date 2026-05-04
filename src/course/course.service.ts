@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { CourseClassEntity } from '../entities/course-class.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -20,6 +24,16 @@ export class CourseService {
 
   // --- QUẢN LÝ KHÓA HỌC (COURSE) ---
   async createCourse(dto: CreateCourseDto) {
+    const trimmedName = dto.name.trim();
+
+    const existing = await this.courseRepo.findOne({
+      where: { name: ILike(`${trimmedName}`) }, // ILike để không phân biệt hoa thường
+    });
+    if (existing) {
+      throw new ConflictException(`Khóa học "${trimmedName}" đã tồn tại`);
+    }
+
+    dto.name = trimmedName; // lưu tên đã trim vào DB
     const course = this.courseRepo.create(dto);
     const newCourse = await this.courseRepo.save(course);
     await this.aiService.syncCourseToVector(newCourse.id);
@@ -84,22 +98,18 @@ export class CourseService {
     return await this.courseRepo.delete(id);
   }
 
-  // --- QUẢN LÝ LỚP HỌC (COURSE CLASS) ---
-  // async createClass(dto: CreateCourseClassDto) {
-  //   const { courseId, ...classData } = dto;
-  //   const course = await this.courseRepo.findOne({ where: { id: courseId } });
-  //   if (!course) throw new NotFoundException('Không tìm thấy khóa học gốc');
-
-  //   const newClass = this.classRepo.create({
-  //     ...classData,
-  //     course,
-  //   });
-  //   return await this.classRepo.save(newClass);
-  // }
-
   async createClass(dto: CreateCourseClassDto) {
     const { courseId, ...classData } = dto;
+    const trimmedName = dto.className.trim();
 
+    const existing = await this.classRepo.findOne({
+      where: { className: ILike(`${trimmedName}`) },
+    });
+    if (existing) {
+      throw new ConflictException(`Lớp học "${trimmedName}" đã tồn tại`);
+    }
+
+    dto.className = trimmedName;
     // 1. Kiểm tra khóa học gốc
     const course = await this.courseRepo.findOne({ where: { id: courseId } });
     if (!course) throw new NotFoundException('Không tìm thấy khóa học gốc');

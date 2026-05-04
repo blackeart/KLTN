@@ -315,7 +315,24 @@
         </form>
       </div>
     </div>
-
+    <div
+      id='errorModal'
+      style='display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;'
+    >
+      <div
+        style='background:#fff; border-radius:10px; padding:32px; max-width:400px; width:90%; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.2);'
+      >
+        <div style='font-size:48px; margin-bottom:12px;'>⚠️</div>
+        <h3 id='errorModalTitle' style='margin:0 0 8px; color:#333;'>Thông báo</h3>
+        <p id='errorModalMsg' style='color:#666; margin:0 0 24px;'></p>
+        <button
+          onclick='closeErrorModal()'
+          style='background:#0072bc; color:#fff; border:none; padding:10px 32px; border-radius:6px; cursor:pointer; font-size:1em;'
+        >
+          Đã hiểu
+        </button>
+      </div>
+    </div>
     <script src='/js/admin.js'></script>
   </body>
 </html>
