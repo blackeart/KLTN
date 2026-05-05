@@ -274,6 +274,44 @@ function getSessionId() {
   return sid;
 }
 
+// Thêm hàm load lịch sử
+async function loadChatHistory() {
+  const sessionId = getSessionId();
+
+  try {
+    const response = await fetch(`/chat/history/${sessionId}`);
+    const messages = await response.json();
+
+    if (messages.length === 0) return;
+
+    // Xóa tin nhắn chào mặc định nếu có lịch sử
+    chatBody.innerHTML = '';
+
+    messages.forEach(({ role, text }) => {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${role}`;
+      msgDiv.innerHTML = renderMarkdown(text);
+      chatBody.appendChild(msgDiv);
+    });
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+  } catch (error) {
+    console.error('Lỗi load lịch sử:', error);
+  }
+}
+
+// Gọi loadChatHistory khi user mở chat window
+chatBtn.onclick = () => {
+  const isHidden = chatWindow.style.display !== 'flex';
+  chatWindow.style.display = isHidden ? 'flex' : 'none';
+
+  // Chỉ load 1 lần khi mở lần đầu
+  if (isHidden && !chatWindow.dataset.loaded) {
+    loadChatHistory();
+    chatWindow.dataset.loaded = 'true';
+  }
+};
+
 // =============================================
 // KHỞI CHẠY KHI DOM SẴN SÀNG
 // =============================================

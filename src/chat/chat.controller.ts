@@ -77,4 +77,9 @@ export class ChatController {
   async getKnowledge2() {
     return 'Kết nối OK!';
   }
+
+  @Get('history/:sessionId')
+  async getHistory(@Param('sessionId') sessionId: string) {
+    return this.aiService.getChatHistory(sessionId);
+  }
 }

@@ -429,4 +429,18 @@ TRẢ LỜI:`;
 
     await this.courseRepo.update(courseId, { embedding: vector });
   }
+
+  async getChatHistory(sessionId: string) {
+    const history = await this.chatRepo.find({
+      where: { sessionId },
+      order: { createdAt: 'ASC' },
+      take: 20,
+    });
+    return history
+      .map((h) => [
+        { role: 'user', text: h.question },
+        { role: 'bot', text: h.answer },
+      ])
+      .flat();
+  }
 }
